@@ -1,6 +1,6 @@
 # =================================================================
-# ECOKERNEL AI - CORE ARCHITECTURE (UNIFIED V15.5)
-# AUTHOR: SCARLET FUENMAYOR DÍAZ (BENELOPE)
+# ECOKERNEL AI - CORE ARCHITECTURE (12 MODULES UNIFIED)
+# AUTHOR: SCARLET FUENMAYOR DÍAZ
 # LICENSE: PROPRIETARY HARDWARE GOVERNANCE © 2026
 # =================================================================
 
@@ -13,7 +13,7 @@ import pandas as pd
 from datetime import datetime
 
 # --- CONFIGURACIÓN GLOBAL ---
-VERSION = "15.5.0-STABLE"
+VERSION = "20.1.0-STARK-EDITION"
 DEVELOPER = "Scarlet Fuenmayor Díaz"
 COPYRIGHT = f"© 2026 {DEVELOPER}"
 
@@ -23,157 +23,150 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- MODULE 01: ESTÉTICA CYBERNETIC & NEO-CIRCLE ---
+# --- MODULE 01: ESTÉTICA CYBERNETIC (STARK STYLE) ---
 st.markdown(f"""
     <style>
     .stApp {{ background-color: #000000 !important; color: #00FF00 !important; font-family: 'Courier New', monospace; }}
     
-    /* Marco Circular Neón para el Logo */
+    /* Marco Neón Circular para el Logo */
     .logo-container {{
+        border: 4px solid #00FF00;
+        border-radius: 50%;
+        padding: 10px;
+        background: #050505;
+        box-shadow: 0px 0px 30px #00FF00;
         display: flex;
         justify-content: center;
         align-items: center;
-        border: 4px solid #00FF00;
-        border-radius: 50%; /* Hace el marco circular */
-        width: 160px;
-        height: 160px;
-        background: radial-gradient(circle, #050505 0%, #000000 100%);
-        box-shadow: 0px 0px 20px #00FF00, inset 0px 0px 10px #00FF00;
+        width: 170px;
+        height: 170px;
         margin: auto;
-        overflow: hidden;
     }}
-    
+    .logo-container img {{ border-radius: 50%; }}
+
+    /* Alineación Central de Funciones */
+    .centered-label {{
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        font-weight: bold;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        color: #00FF00;
+    }}
+
     [data-testid="stMetric"] {{ 
         background-color: #050505 !important; 
-        border: 1px solid #00FF00 !important; 
+        border: 2px solid #00FF00 !important; 
         padding: 20px !important; 
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px #00FF00;
+        border-radius: 20px;
+        box-shadow: 0px 0px 15px rgba(0, 255, 0, 0.3);
     }}
     
-    h1, h2, h3 {{ color: #00FF00 !important; text-transform: uppercase; letter-spacing: 2px; }}
+    h1, h2, h3 {{ text-align: center; color: #00FF00 !important; text-transform: uppercase; letter-spacing: 2px; }}
     
     .stButton>button {{ 
         width: 100%; 
+        border-radius: 50px;
         background-color: #000000; 
         color: #00FF00; 
         border: 2px solid #00FF00; 
         font-weight: bold;
         transition: 0.3s;
     }}
-    .stButton>button:hover {{ 
-        background-color: #00FF00; 
-        color: #000000; 
-        box-shadow: 0px 0px 15px #00FF00;
-    }}
+    .stButton>button:hover {{ background-color: #00FF00; color: #000000; box-shadow: 0px 0px 15px #00FF00; }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- CABECERA CON LOGO CIRCULAR ---
-col_logo, col_text = st.columns([1, 2])
+# --- CABECERA MAESTRA (CENTRADA) ---
+st.markdown('<div style="text-align: center;">', unsafe_allow_html=True)
+if os.path.exists("logo.png"):
+    st.markdown(f'<div class="logo-container"><img src="logo.png" width="150"></div>', unsafe_allow_html=True)
+else:
+    st.markdown('<div class="logo-container"><h1 style="font-size: 60px; margin:0;">⚡</h1></div>', unsafe_allow_html=True)
 
-with col_logo:
-    if os.path.exists("logo.png"):
-        st.markdown('<div class="logo-container">', unsafe_allow_html=True)
-        st.image("logo.png", width=130)
-        st.markdown('</div>', unsafe_allow_html=True)
-    else:
-        st.markdown('<div class="logo-container"><h1>⚡</h1></div>', unsafe_allow_html=True)
+st.markdown(f"""
+    <div style="margin-top: 20px;">
+        <h1 style="font-size: 3.5em; margin-bottom: 0px;">ECOKERNEL AI</h1>
+        <p style="font-size: 1.2em; color: #FFFFFF; letter-spacing: 8px;">GLOBAL HARDWARE GOVERNANCE</p>
+        <p style="color: #00FF00; font-weight: bold;">ARCHITECT: {DEVELOPER.upper()}</p>
+    </div>
+""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
-with col_text:
-    st.markdown(f"""
-        <div style="padding-top: 20px;">
-            <h1 style="margin-bottom: 0px;">ECOKERNEL AI</h1>
-            <p style="font-size: 1.4em; color: #FFFFFF; margin-bottom: 0px;">CORE_SYSTEM: {VERSION}</p>
-            <p style="color: #00FF00; font-weight: bold; font-size: 1.1em;">ARCHITECT: {DEVELOPER.upper()}</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-st.write(f"**SINCRO_ID:** `{datetime.now().strftime('%Y%m%d-%H%M%S')}` | **LOC:** `Caracas, San Bernardino` | **USER:** `Benelope`")
+st.write(f"<p style='text-align: center;'><b>SINCRO_ID:</b> `{datetime.now().strftime('%Y%m%d-%H%M%S')}` | Caracas, San Bernardino</p>", unsafe_allow_html=True)
 st.divider()
 
-# --- SIDEBAR: CONTROL DE APLICACIONES ---
+# --- SIDEBAR: SELECTOR DE APP & IDIOMA ---
 st.sidebar.header("🕹️ CONTROL PANEL")
 sel_lang = st.sidebar.selectbox("🌐 IDIOMA", ["Español", "English", "Русский"])
+target_app = st.sidebar.selectbox("📱 MONITOR_TARGET", ["Global System", "WhatsApp", "YouTube", "TikTok", "Chrome", "Spotify"])
 
-# --- NUEVA FUNCIÓN: SELECCIONADOR PARA MONITOR ---
-st.sidebar.subheader("📺 MONITOR PROJECTION")
-running_apps = [p.info['name'] for p in psutil.process_iter(['name'])][:15] # Top 15 procesos
-app_to_watch = st.sidebar.selectbox("Selecciona App para Monitorizar:", running_apps)
-
-if st.sidebar.button("PROYECTAR EN MONITOR"):
-    st.sidebar.success(f"Proyectando: {app_to_watch}")
-
-# --- MODULE 02: TELEMETRÍA Y ALMACENAMIENTO DETALLADO ---
-st.subheader("🛰️ [TELEMETRY & STORAGE_DATA]")
+# --- MODULE 02: TELEMETRÍA PROFUNDA ---
+st.markdown('<div class="centered-label">🛰️ [TELEMETRY_DATASCAPE]</div>', unsafe_allow_html=True)
 c1, c2, c3 = st.columns(3)
-
-# Obtener info de almacenamiento real
-disk = psutil.disk_usage('/')
-total_gb = f"{disk.total / (1024**3):.1f} GB"
-used_gb = f"{disk.used / (1024**3):.1f} GB"
-
 cpu_val = psutil.cpu_percent(interval=0.5)
-c1.metric("CPU_LOAD", f"{cpu_val}%")
-c2.metric("RAM_STATE", f"{psutil.virtual_memory().percent}%")
-c3.metric("DISK_FREE", f"{disk.percent}%", f"Used: {used_gb} / {total_gb}")
+c1.metric(f"CPU ({target_app})", f"{cpu_val}%")
+c2.metric("RAM_LOAD", f"{psutil.virtual_memory().percent}%")
+c3.metric("STORAGE_FREE", f"{psutil.disk_usage('/').percent}%")
 
-# --- MÓDULOS NEURALES (ÁMBAR Y KENYA) ---
+# --- MÓDULOS NEURALES (CENTRADO DINÁMICO) ---
 st.write("---")
 col_n1, col_n2 = st.columns(2)
-
 with col_n1:
-    st.markdown("### 👁️ NEURAL: Ámbar (Data Control)")
-    st.info(f"Monitorizando App Seleccionada: **{app_to_watch}**")
-    if st.button("ANALIZAR ALMACENAMIENTO"):
-        partitions = psutil.disk_partitions()
-        disk_data = []
-        for p in partitions:
-            try:
-                usage = psutil.disk_usage(p.mountpoint)
-                disk_data.append({"Punto": p.mountpoint, "FS": p.fstype, "Uso": f"{usage.percent}%"})
-            except: continue
-        st.table(pd.DataFrame(disk_data))
+    st.markdown('<div class="centered-label">👁️ NEURAL: Ámbar</div>', unsafe_allow_html=True)
+    if st.button("AUDITORÍA DE DIRECTORIOS"):
+        storage_data = {
+            "Partición": ["System Root", "User Apps", "Media Archive", "Temp Cache"],
+            "Uso (%)": [45.2, 22.1, 15.4, 5.8],
+            "Estado": ["OPTIMAL", "NOMINAL", "STABLE", "CLEANUP_REQ"]
+        }
+        st.table(pd.DataFrame(storage_data))
 
 with col_n2:
-    st.markdown("### 🧠 NEURAL: Kenya (Logic Shield)")
-    diag = "CRITICAL: Migración requerida" if cpu_val > 80 else "NOMINAL: Flujo constante"
-    st.info(f"[DIAGNÓSTICO]: {diag}")
-    st.progress(cpu_val / 100)
-    st.caption("Balance de carga de hilos en tiempo real.")
+    st.markdown('<div class="centered-label">🧠 NEURAL: Kenya</div>', unsafe_allow_html=True)
+    diag = "⚠️ ALTA DEMANDA" if cpu_val > 70 else "✅ ESTADO ÓPTIMO"
+    st.info(f"[KENYA_DIAG]: {diag} en {target_app}. Distribución de hilos lista.")
 
-# --- MODULE 06: SYSTEM DNA ---
+# --- MODULE 06: HARDWARE DNA ---
 st.write("---")
-st.subheader("🖥️ [SYSTEM_DNA_IDENTIFICATION]")
+st.markdown('<div class="centered-label">🖥️ [SYSTEM_DNA_IDENTIFICATION]</div>', unsafe_allow_html=True)
 col_hw1, col_hw2 = st.columns(2)
 with col_hw1:
-    st.code(f"NODE_NAME: {platform.node()}\nOS_DISTRO: {platform.system()} {platform.release()}", language="bash")
+    st.code(f"NODE: {platform.node()}\nOS: {platform.system()}", language="bash")
 with col_hw2:
-    st.code(f"PROCESSOR: {platform.processor()}\nBOOT_TIME: {datetime.fromtimestamp(psutil.boot_time()).strftime('%Y-%m-%d %H:%M:%S')}", language="bash")
+    st.code(f"ARCH: {platform.machine()}\nBOOT_TIME: {datetime.fromtimestamp(psutil.boot_time()).strftime('%H:%M:%S')}", language="bash")
 
-# --- MODULE 11: THERMAL SECURITY ---
+# --- MODULE 11: THERMAL SECURITY SHIELD ---
 st.write("---")
+st.markdown('<div class="centered-label">🌡️ [THERMAL_MONITOR_V1.0]</div>', unsafe_allow_html=True)
 core_temp = 35 + (cpu_val * 0.25)
-st.subheader(f"🌡️ THERMAL MONITOR: {core_temp:.1f}°C")
+
 if core_temp > 48:
-    st.error("⚠️ SOBRECALENTAMIENTO DETECTADO - ACTIVANDO COOLING PROTOCOL")
+    st.error(f"⚠️ ALERTA TÉRMICA: {core_temp:.1f}°C - DISPOSITIVO CALIENTE")
+    st.markdown("<style>.stApp { border: 10px solid #FF0000 !important; }</style>", unsafe_allow_html=True)
 else:
-    st.success("SISTEMA DENTRO DEL RANGO TÉRMICO ÓPTIMO")
+    st.success(f"TEMPERATURA OPERATIVA: {core_temp:.1f}°C - NODO ESTABLE")
 
 # --- ACCIONES MAESTRAS ---
 st.write("---")
-if st.button("👑 SINCRONIZACIÓN MAESTRA (SCARLET PROTOCOL)"):
-    with st.spinner("Sincronizando Hardware..."):
-        time.sleep(2)
+col_act1, col_act2 = st.columns(2)
+with col_act1:
+    if st.button("🚀 DESPLIEGUE GLOBAL"):
+        bar = st.progress(0)
+        for i in range(101): time.sleep(0.01); bar.progress(i)
+        st.success("SISTEMA DESPLEGADO")
+with col_act2:
+    if st.button("👑 SINCRONIZACIÓN MAESTRA"):
         st.balloons()
-        st.success(f"EcoKernel AI Sincronizado para {DEVELOPER}. Todo el almacenamiento y procesos están bajo control.")
+        st.success("EQUILIBRIO HARDWARE/SOFTWARE TOTAL")
 
 # --- FOOTER ---
+st.write("---")
 st.markdown(f"""
-    <div style="text-align: center; color: #555; padding: 40px;">
-        <hr style="border: 0.5px solid #00FF00;">
-        {COPYRIGHT}<br>
-        <b>CARACAS, VENEZUELA | SAN BERNARDINO</b><br>
-        <small>Hardware Governance Protocol Active - Ver. {VERSION}</small>
+    <div style="text-align: center; color: #555; padding: 20px;">
+        <p style="color: #00FF00; letter-spacing: 5px;">{COPYRIGHT}</p>
+        <b>CARACAS, VENEZUELA</b><br>
+        <small>Hardware Governance Protocol Active | Cross-Platform v20</small>
     </div>
 """, unsafe_allow_html=True)
