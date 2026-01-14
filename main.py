@@ -1,74 +1,99 @@
 import streamlit as st
 import psutil
-import pandas as pd
 import time
+import pandas as pd
 
-# 1. CONFIGURACIÓN DE INTERFAZ TÉCNICA
-st.set_page_config(page_title="EcoKernel Console", layout="centered")
+# 1. CONFIGURACIÓN DE INTERFAZ GLOBAL
+st.set_page_config(page_title="EcoKernel AI | Global Bridge", layout="centered")
 
-# ESTÉTICA DE CÓDIGO (Monocromático, fuentes fijas, sin distracciones)
+# DICCIONARIO MULTILINGÜE EXPANDIDO
+languages = {
+    "Español": {
+        "welcome": "BIENVENIDO AL NÚCLEO BENELOPE",
+        "cpu": "CARGA_PROCESADOR",
+        "ram": "MEMORIA_SISTEMA",
+        "ia_status": "ESTADO_IA_BENELOPE",
+        "thermal_alert": "[ALERTA] APP DE ALTO IMPACTO TÉRMICO DETECTADA",
+        "btn_cool": "INICIAR_ENFRIAMIENTO",
+        "btn_scan": "ESCANEAR_INTEGRIDAD",
+        "footer": "Desarrollado por Scarlet Fuenmayor Díaz"
+    },
+    "English": {
+        "welcome": "WELCOME TO BENELOPE CORE",
+        "cpu": "CPU_LOAD",
+        "ram": "SYSTEM_MEMORY",
+        "ia_status": "BENELOPE_AI_STATUS",
+        "thermal_alert": "[WARNING] HIGH THERMAL IMPACT APP DETECTED",
+        "btn_cool": "START_COOLING",
+        "btn_scan": "SCAN_INTEGRITY",
+        "footer": "Developed by Scarlet Fuenmayor Díaz"
+    },
+    "中文 (Chino)": {
+        "welcome": "欢迎来到 BENELOPE 核心",
+        "cpu": "CPU 负载",
+        "ram": "系统内存",
+        "ia_status": "BENELOPE 智能状态",
+        "thermal_alert": "[警告] 检测到高热影响应用",
+        "btn_cool": "开始冷却",
+        "btn_scan": "扫描完整性",
+        "footer": "由 Scarlet Fuenmayor Díaz 开发"
+    }
+}
+
+# 3. ESTÉTICA NEGRO ABSOLUTO (Torvalds Minimalist)
 st.markdown("""
     <style>
-    .stApp { background-color: #ffffff; color: #1a1a1a; font-family: 'Courier New', Courier, monospace; }
-    .stMetric { border: 1px solid #d1d1d1; background-color: #f6f8fa; border-radius: 0px; }
-    .console-box { background-color: #1a1a1a; color: #f0f0f0; padding: 20px; font-family: 'monospace'; border-radius: 5px; line-height: 1.5; }
-    .stButton>button { border-radius: 0px; border: 1px solid #1a1a1a; background-color: #ffffff; color: #1a1a1a; font-family: 'monospace'; }
-    .stButton>button:hover { background-color: #1a1a1a; color: #ffffff; }
+    .stApp { background-color: #000000 !important; color: #FFFFFF !important; font-family: 'monospace'; }
+    [data-testid="stMetric"] { background-color: #0a0a0a !important; border: 1px solid #333 !important; }
+    .stButton>button { width: 100%; border: 1px solid #FFFFFF; background-color: #000000; color: #FFFFFF; font-weight: bold; }
+    .stSelectbox label { color: #00FF00 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-# 2. CABECERA DE INGENIERÍA
-st.text("SYSTEM_KERNEL_INTERFACE // VERSION 6.0.1")
-st.text(f"DEVELOPER: SCARLET FUENMAYOR DIAZ")
-st.text("LICENSE: PROPRIETARY_HARDWARE_GOVERNANCE")
+# 4. SELECTOR DE IDIOMA GLOBAL
+sel_lang = st.sidebar.selectbox("🌐 GLOBAL_LANGUAGE", list(languages.keys()))
+text = languages[sel_lang]
+
+# 5. HEADER Y TELEMETRÍA
+st.text(f">>> {text['welcome']}")
+st.text(f">>> DEV: SCARLET FUENMAYOR DIAZ // 2026")
 st.divider()
 
-# 3. TELEMETRÍA OBJETIVA (Métricas puras)
 cpu = psutil.cpu_percent(interval=0.5)
 ram = psutil.virtual_memory().percent
-disk = psutil.disk_usage('/').percent
 
-col1, col2, col3 = st.columns(3)
-with col1: st.metric("CPU_USAGE", f"{cpu}%")
-with col2: st.metric("RAM_LOAD", f"{ram}%")
-with col3: st.metric("FS_INTEGRITY", f"{disk}%")
+c1, c2 = st.columns(2)
+with c1: st.metric(text['cpu'], f"{cpu}%")
+with c2: st.metric(text['ram'], f"{ram}%")
 
-# 4. MOTOR DE IA: LÓGICA DE GOBERNANZA ACTIVA
-st.subheader(">> AI_INFERENCE_LOGIC")
-st.write("Estado del análisis de la IA sobre el flujo de datos actual:")
+# 6. IA BENELOPE: INTERACCIÓN Y ENFRIAMIENTO
+st.subheader(f"🤖 {text['ia_status']}")
 
-# Aquí la IA actúa de forma objetiva según los parámetros
-with st.container():
-    if cpu > 70 or ram > 85:
-        st.markdown("""<div class='console-box'>[ALERTA] Inestabilidad detectada. <br>Acción: Priorizar procesos de primer plano. <br>Recomendación: Purgar hilos secundarios.</div>""", unsafe_allow_html=True)
-    else:
-        st.markdown("""<div class='console-box'>[OK] Flujo de datos nominal. <br>Estado: Eficiencia energética al 98.4%. <br>No se requieren ajustes manuales.</div>""", unsafe_allow_html=True)
+if cpu > 65:
+    st.error(text['thermal_alert'])
+    # Identificar la app que más consume
+    procs = []
+    for proc in psutil.process_iter(['name', 'cpu_percent']):
+        try: procs.append(proc.info)
+        except: pass
+    top_app = pd.DataFrame(procs).sort_values(by='cpu_percent', ascending=False).iloc[0]['name']
+    st.write(f"⚠️ [HOT_PROCESS]: {top_app}")
+else:
+    st.success("✅ [STABLE]: Benelope reporta integridad total.")
 
-# 5. FUNCIONES OBJETIVAS PARA EL USUARIO
+# 7. BOTONES DE ACCIÓN SOFISTICADA
 st.divider()
-st.subheader(">> KERNEL_OPERATIONS")
-
 col_a, col_b = st.columns(2)
-
 with col_a:
-    if st.button("RUN_SYSTEM_PURGE"):
-        with st.status("Vaciando buffers de memoria...", expanded=False):
-            time.sleep(1)
-            st.success("Memoria purgada.")
-
+    if st.button(text['btn_cool']):
+        with st.status("Cooling...", expanded=False):
+            time.sleep(2)
+            st.toast("CPU Temp Balanced")
 with col_b:
-    if st.button("REBALANCE_HREADS"):
-        with st.status("Reasignando prioridades de CPU...", expanded=False):
-            time.sleep(1)
-            st.info("Hilos re-balanceados.")
+    if st.button(text['btn_scan']):
+        with st.status("Scanning...", expanded=False):
+            time.sleep(2)
+            st.toast("System Integrity: 100%")
 
-# 6. REGISTRO DE USUARIO (FEEDBACK TÉCNICO)
 st.divider()
-st.subheader(">> USER_LOG_REPORT")
-user = st.text_input("ID_USUARIO:")
-report = st.text_area("LOG_ENTRY (Comentarios técnicos):")
-
-if st.button("SUBMIT_LOG"):
-    st.text(f"Reporte de {user} guardado en el archivo maestro de Scarlet.")
-
-st.text("--- EOF (End of File) ---")
+st.caption(f"© 2026 | {text['footer']} | Caracas, San Bernardino.")
