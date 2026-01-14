@@ -17,7 +17,7 @@ VERSION = "15.0.4-MASTER"
 DEVELOPER = "Scarlet Fuenmayor Díaz"
 COPYRIGHT = f"© 2026 {DEVELOPER}"
 
-# 1. CORRECCIÓN: Ahora el icono de la pestaña será tu logo.png [cite: 2026-01-14]
+# Configuración de la pestaña y el icono
 st.set_page_config(
     page_title=f"EcoKernel AI | {DEVELOPER}",
     page_icon="logo.png", 
@@ -34,13 +34,14 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-# 2. CORRECCIÓN: Insertar el logo visual al inicio de la App [cite: 2026-01-14]
+# Sección del Logo y Título Principal
 col_logo, col_text = st.columns([1, 4])
 with col_logo:
+    # Verificamos si el archivo existe para evitar errores visuales
     if os.path.exists("logo.png"):
-        st.image("logo.png", width=120) # Tu imagen de 512x512 ajustada [cite: 2026-01-14]
+        st.image("logo.png", width=120)
     else:
-        st.write("⚡") # Backup por si el archivo no carga
+        st.write("⚡")
 
 with col_text:
     st.write(f"### ECOKERNEL AI: MASTER_CORE_v15.0")
@@ -80,7 +81,6 @@ c3.metric("STORAGE", f"{psutil.disk_usage('/').percent}%")
 st.write("---")
 st.subheader("👁️ INTERFAZ_NEURAL: Ámbar")
 if st.button("EJECUTAR: AUDITORÍA_DE_DIRECTORIOS"):
-    # Simulación de rutas para el reporte
     report = [{"Directorio": "WhatsApp_Cache", "MB": 150.5, "Estado": "HEAVY"}]
     st.table(pd.DataFrame(report))
 
@@ -130,4 +130,4 @@ if st.button("🚀 SINCRONIZACIÓN MAESTRA"):
     st.success("SINCRONIZACIÓN COMPLETA: Hardware y Software en equilibrio.")
 
 st.write("---")
-st.markdown(f"<center>{COPYRIGHT}<br>Caracas, San Bernardino</center>", unsafe_allow_html=True) [cite: 2026-01-02]
+st.markdown(f"<center>{COPYRIGHT}<br>Caracas, San Bernardino</center>", unsafe_allow_html=True)
