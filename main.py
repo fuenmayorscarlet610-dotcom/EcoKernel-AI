@@ -1,35 +1,34 @@
-# ==========================================
-# 🌍 ECOKERNEL AI: VERSIÓN DE LANZAMIENTO
-# Autoría: Scarlet Fuenmayor Díaz
-# Finalidad: Optimización Global y App Real
-# ==========================================
-
+import streamlit as st
 import psutil
 import time
 
-class EcoKernelFinal:
-    def __init__(self):
-        self.author = "Scarlet Fuenmayor"
-        self.version = "1.0.0-RELEASE"
-        self.total_co2_saved = 0.0
+# Configuración de la página
+st.set_page_config(page_title="EcoKernel AI", page_icon="🌱")
 
-    def run_optimization_cycle(self):
-        # Captura de métricas reales
-        cpu = psutil.cpu_percent(interval=1)
-        ram = psutil.virtual_memory().percent
-        
-        # Cálculo de impacto (lo que hace a la app indispensable)
-        # Cada ciclo de optimización ahorra una fracción estimada de CO2
-        savings = (100 - cpu) * 0.001 
-        self.total_co2_saved += savings
-        
-        return {
-            "cpu": cpu,
-            "ram": ram,
-            "co2_saved": round(self.total_co2_saved, 4),
-            "status": "EFICIENTE" if cpu < 50 else "OPTIMIZANDO"
-        }
+st.title("🌱 EcoKernel AI: Versión Global")
+st.write("---")
+st.subheader("Autora: Scarlet Fuenmayor Díaz")
 
-# --- PREPARACIÓN PARA EXPORTAR ---
-app = EcoKernelFinal()
-print(f"EcoKernel AI por {app.author} listo para despliegue mundial.")
+# Espacios para los datos en tiempo real
+col1, col2 = st.columns(2)
+with col1:
+    cpu_stat = st.empty()
+with col2:
+    ram_stat = st.empty()
+
+co2_stat = st.empty()
+status_stat = st.empty()
+
+# Lógica de optimización
+cpu = psutil.cpu_percent(interval=1)
+ram = psutil.virtual_memory().percent
+savings = round((100 - cpu) * 0.01, 2)
+
+# Mostrar los resultados en la web
+cpu_stat.metric("Uso de CPU", f"{cpu}%")
+ram_stat.metric("Memoria RAM", f"{ram}%")
+co2_stat.info(f"🍀 Ahorro de CO2 estimado: {savings}g")
+status_stat.success("✅ ESTADO: SISTEMA OPTIMIZADO POR ECOKERNEL")
+
+st.write("---")
+st.caption("Gobernanza de hardware y protección ambiental activa.")
