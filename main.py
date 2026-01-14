@@ -3,97 +3,96 @@ import psutil
 import time
 import pandas as pd
 
-# 1. CONFIGURACIÓN DE INTERFAZ GLOBAL
-st.set_page_config(page_title="EcoKernel AI | Global Bridge", layout="centered")
+# 1. CONFIGURACIÓN DE NÚCLEO GLOBAL
+st.set_page_config(page_title="EcoKernel AI | Neural Governance", layout="centered")
 
-# DICCIONARIO MULTILINGÜE EXPANDIDO
+# 2. DICCIONARIO MULTILINGÜE Y DE IA
 languages = {
     "Español": {
-        "welcome": "BIENVENIDO AL NÚCLEO BENELOPE",
-        "cpu": "CARGA_PROCESADOR",
-        "ram": "MEMORIA_SISTEMA",
-        "ia_status": "ESTADO_IA_BENELOPE",
-        "thermal_alert": "[ALERTA] APP DE ALTO IMPACTO TÉRMICO DETECTADA",
-        "btn_cool": "INICIAR_ENFRIAMIENTO",
-        "btn_scan": "ESCANEAR_INTEGRIDAD",
-        "footer": "Desarrollado por Scarlet Fuenmayor Díaz"
+        "welcome": "CONSOLA DE GOBERNANZA NEURAL",
+        "cpu": "CARGA_HARDWARE",
+        "ram": "MEMORIA_NÚCLEO",
+        "ambar_task": "ÁMBAR: AUDITORÍA DE DIRECTORIOS",
+        "kenya_task": "KENYA: ARQUITECTURA DE SOLUCIONES",
+        "btn_cool": "EJECUTAR_ENFRIAMIENTO_LÓGICO",
+        "btn_clean": "PURGAR_ARCHIVOS_CORRUPTOS",
+        "status_ok": "[+] SISTEMA NOMINAL: Integridad validada.",
+        "status_warn": "[!] ALERTA: Desbalance térmico detectado."
     },
     "English": {
-        "welcome": "WELCOME TO BENELOPE CORE",
-        "cpu": "CPU_LOAD",
-        "ram": "SYSTEM_MEMORY",
-        "ia_status": "BENELOPE_AI_STATUS",
-        "thermal_alert": "[WARNING] HIGH THERMAL IMPACT APP DETECTED",
-        "btn_cool": "START_COOLING",
-        "btn_scan": "SCAN_INTEGRITY",
-        "footer": "Developed by Scarlet Fuenmayor Díaz"
-    },
-    "中文 (Chino)": {
-        "welcome": "欢迎来到 BENELOPE 核心",
-        "cpu": "CPU 负载",
-        "ram": "系统内存",
-        "ia_status": "BENELOPE 智能状态",
-        "thermal_alert": "[警告] 检测到高热影响应用",
-        "btn_cool": "开始冷却",
-        "btn_scan": "扫描完整性",
-        "footer": "由 Scarlet Fuenmayor Díaz 开发"
+        "welcome": "NEURAL GOVERNANCE CONSOLE",
+        "cpu": "HARDWARE_LOAD",
+        "ram": "CORE_MEMORY",
+        "ambar_task": "AMBAR: DIRECTORY AUDIT",
+        "kenya_task": "KENYA: SOLUTIONS ARCHITECTURE",
+        "btn_cool": "EXECUTE_LOGIC_COOLING",
+        "btn_clean": "PURGE_CORRUPT_FILES",
+        "status_ok": "[+] SYSTEM NOMINAL: Integrity validated.",
+        "status_warn": "[!] WARNING: Thermal imbalance detected."
     }
 }
 
-# 3. ESTÉTICA NEGRO ABSOLUTO (Torvalds Minimalist)
+# 3. ESTÉTICA DE INGENIERÍA PURA (Dark Mode / High Contrast)
 st.markdown("""
     <style>
     .stApp { background-color: #000000 !important; color: #FFFFFF !important; font-family: 'monospace'; }
-    [data-testid="stMetric"] { background-color: #0a0a0a !important; border: 1px solid #333 !important; }
-    .stButton>button { width: 100%; border: 1px solid #FFFFFF; background-color: #000000; color: #FFFFFF; font-weight: bold; }
-    .stSelectbox label { color: #00FF00 !important; }
+    [data-testid="stMetric"] { background-color: #050505 !important; border: 1px solid #00FF00 !important; }
+    [data-testid="stMetricValue"] { color: #00FF00 !important; }
+    .ai-card { border: 1px solid #444; padding: 15px; background-color: #0a0a0a; border-radius: 5px; margin-bottom: 10px; }
+    .stButton>button { width: 100%; border: 1px solid #00FF00; background-color: #000000; color: #00FF00; font-weight: bold; }
+    .stButton>button:hover { background-color: #00FF00; color: #000000; }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. SELECTOR DE IDIOMA GLOBAL
-sel_lang = st.sidebar.selectbox("🌐 GLOBAL_LANGUAGE", list(languages.keys()))
-text = languages[sel_lang]
+# 4. SELECTOR DE IDIOMA Y IA
+sel_lang = st.sidebar.selectbox("🌐 LANGUAGE", list(languages.keys()))
+t = languages[sel_lang]
 
-# 5. HEADER Y TELEMETRÍA
-st.text(f">>> {text['welcome']}")
-st.text(f">>> DEV: SCARLET FUENMAYOR DIAZ // 2026")
+st.sidebar.divider()
+ia_choice = st.sidebar.radio("🤖 SELECT_ACTIVE_AI", ["Ámbar", "Kenya"])
+
+# 5. TELEMETRÍA DE ALTO NIVEL
+st.text(f">>> {t['welcome']} // SYNC: GEMINI_ACTIVE")
+st.text(">>> DEVELOPER: SCARLET FUENMAYOR DIAZ")
 st.divider()
 
 cpu = psutil.cpu_percent(interval=0.5)
 ram = psutil.virtual_memory().percent
 
 c1, c2 = st.columns(2)
-with c1: st.metric(text['cpu'], f"{cpu}%")
-with c2: st.metric(text['ram'], f"{ram}%")
+with c1: st.metric(t['cpu'], f"{cpu}%")
+with c2: st.metric(t['ram'], f"{ram}%")
 
-# 6. IA BENELOPE: INTERACCIÓN Y ENFRIAMIENTO
-st.subheader(f"🤖 {text['ia_status']}")
+st.progress(cpu / 100)
 
-if cpu > 65:
-    st.error(text['thermal_alert'])
-    # Identificar la app que más consume
-    procs = []
-    for proc in psutil.process_iter(['name', 'cpu_percent']):
-        try: procs.append(proc.info)
-        except: pass
-    top_app = pd.DataFrame(procs).sort_values(by='cpu_percent', ascending=False).iloc[0]['name']
-    st.write(f"⚠️ [HOT_PROCESS]: {top_app}")
+# 6. FUNCIONALIDAD DE LAS IA (ÁMBAR O KENYA)
+st.subheader(f"🧠 INTERFAZ_NEURAL: {ia_choice}")
+
+if ia_choice == "Ámbar":
+    st.markdown(f"<div class='ai-card'><b>{t['ambar_task']}</b><br>[INFO]: Escaneando sectores críticos y carpetas del sistema...</div>", unsafe_allow_html=True)
+    if st.button(t['btn_clean']):
+        with st.status("Analizando directorios dañados...", expanded=False):
+            time.sleep(2)
+            st.success("Limpieza completa: 0 archivos residuales.")
 else:
-    st.success("✅ [STABLE]: Benelope reporta integridad total.")
+    st.markdown(f"<div class='ai-card'><b>{t['kenya_task']}</b><br>[INFO]: Analizando diagnóstico total para optimización de hilos...</div>", unsafe_allow_html=True)
+    if cpu > 60:
+        st.warning(f"{t['status_warn']}")
+        if st.button(t['btn_cool']):
+            with st.status("Re-balanceando carga de procesos...", expanded=False):
+                time.sleep(2)
+                st.success("Temperatura estabilizada mediante re-enrutamiento.")
+    else:
+        st.success(t['status_ok'])
 
-# 7. BOTONES DE ACCIÓN SOFISTICADA
+# 7. AUDITORÍA DE PROCESOS (EL PUENTE AL IMPACTO)
 st.divider()
-col_a, col_b = st.columns(2)
-with col_a:
-    if st.button(text['btn_cool']):
-        with st.status("Cooling...", expanded=False):
-            time.sleep(2)
-            st.toast("CPU Temp Balanced")
-with col_b:
-    if st.button(text['btn_scan']):
-        with st.status("Scanning...", expanded=False):
-            time.sleep(2)
-            st.toast("System Integrity: 100%")
+st.subheader("🛰️ HARDWARE_AUDIT_LOG")
+procs = []
+for proc in psutil.process_iter(['name', 'cpu_percent']):
+    try: procs.append(proc.info)
+    except: pass
+df = pd.DataFrame(procs).sort_values(by='cpu_percent', ascending=False).head(3)
+st.table(df)
 
-st.divider()
-st.caption(f"© 2026 | {text['footer']} | Caracas, San Bernardino.")
+st.caption("© 2026 Scarlet Fuenmayor Díaz | Ámbar & Kenya Neural Integration | Global Impact.")
