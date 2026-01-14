@@ -1,5 +1,5 @@
 # =================================================================
-# MODULE 01: CORE IDENTITY & CYBERNETIC AESTHETICS
+# ECOKERNEL AI - CORE ARCHITECTURE (10 MODULES UNIFIED)
 # AUTHOR: SCARLET FUENMAYOR DÍAZ
 # LICENSE: PROPRIETARY HARDWARE GOVERNANCE © 2026
 # =================================================================
@@ -9,91 +9,45 @@ import psutil
 import platform
 import os
 import time
+import pandas as pd  # IMPORTANTE: Añadida para manejar tablas
 from datetime import datetime
 
-# --- CONFIGURACIÓN DE SEGURIDAD Y ENTORNO ---
+# --- CONFIGURACIÓN GLOBAL ---
+VERSION = "15.0.4-MASTER"
+DEVELOPER = "Scarlet Fuenmayor Díaz"
+COPYRIGHT = f"© 2026 {DEVELOPER}"
+
 st.set_page_config(
-    page_title="EcoKernel AI | Scarlet Fuenmayor",
+    page_title=f"EcoKernel AI | {DEVELOPER}",
     page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-# --- IDENTIDAD DE LA ARQUITECTA NEURAL ---
-# Información recuperada de la base de datos de Scarlet [cite: 2026-01-02]
-DEV_INFO = {
-    "Name": "Scarlet Fuenmayor Díaz",
-    "Alias": "Benelope",
-    "Location": "Caracas, San Bernardino",
-    "Year": 2026
-}
-
-# --- MOTOR DE ESTILOS CSS (DISEÑO PARA SAMSUNG A31) ---
-def inject_custom_css():
-    st.markdown(f"""
-        <style>
-        /* Fondo Negro Absoluto para ahorro de energía OLED */
-        .stApp {{
-            background-color: #000000 !important;
-            color: #00FF00 !important;
-            font-family: 'Courier New', monospace;
-        }}
-        
-        /* Contenedores de Métricas Estilo Rack de Servidor */
-        [data-testid="stMetric"] {{
-            background-color: #050505 !important;
-            border: 1px solid #00FF00 !important;
-            padding: 15px !important;
-            box-shadow: 0px 0px 10px #00FF0033;
-        }}
-        
-        /* Botones de Acción de Alto Contraste */
-        .stButton>button {{
-            width: 100%;
-            background-color: #000000;
-            color: #00FF00;
-            border: 2px solid #00FF00;
-            border-radius: 0px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }}
-        
-        .stButton>button:hover {{
-            background-color: #00FF00;
-            color: #000000;
-        }}
-        
-        /* Ocultar elementos innecesarios de Streamlit */
-        #MainMenu {{visibility: hidden;}}
-        footer {{visibility: hidden;}}
-        </style>
+# --- MODULE 01: ESTÉTICA CYBERNETIC ---
+st.markdown(f"""
+    <style>
+    .stApp {{ background-color: #000000 !important; color: #00FF00 !important; font-family: 'Courier New', monospace; }}
+    [data-testid="stMetric"] {{ background-color: #050505 !important; border: 1px solid #00FF00 !important; padding: 15px !important; }}
+    .stButton>button {{ width: 100%; background-color: #000000; color: #00FF00; border: 2px solid #00FF00; font-weight: bold; }}
+    .stButton>button:hover {{ background-color: #00FF00; color: #000000; }}
+    </style>
     """, unsafe_allow_html=True)
 
-inject_custom_css()
-
-# --- ENCABEZADO DE GOBERNANZA ---
 st.write(f"### ⚡ ECOKERNEL AI: MASTER_CORE_v15.0")
-st.write(f"**ARCHITECT:** {DEV_INFO['Name']} // **UNIT:** {DEV_INFO['Year']}-ALPHA")
+st.write(f"**ARCHITECT:** {DEVELOPER} // **UNIT:** 2026-ALPHA")
 st.text(f"ID_SINCRO: {datetime.now().strftime('%Y%m%d-%H%M%S')}")
-st.divider()
-# =================================================================
-# MODULE 02: DEEP TELEMETRY & APP IMPACT ENGINE
-# =================================================================
 
-# --- FUNCIÓN DE ESCANEO DE APLICACIONES EN TIEMPO REAL ---
+# --- SELECTOR GLOBAL DE IDIOMA (Para Módulo 05) ---
+sel_lang = st.sidebar.selectbox("🌐 GLOBAL_LANGUAGE", ["Español", "English", "Русский (Ruso)"])
+
+# --- MODULE 02: TELEMETRÍA PROFUNDA ---
 def get_app_metrics():
-    """Analiza el impacto de las apps principales en el hardware."""
-    # Lista de procesos objetivo para Scarlet Fuenmayor Díaz
     target_apps = {
         "WhatsApp": ["com.whatsapp", "WhatsApp"],
         "Facebook": ["com.facebook.katana", "Facebook"],
-        "YouTube": ["com.google.android.youtube", "YouTube", "youtube"],
-        "Chrome": ["com.android.chrome", "chrome"]
+        "YouTube": ["com.google.android.youtube", "YouTube"]
     }
-    
     app_results = []
-    
-    # Escaneo de procesos activos en el Kernel
     for proc in psutil.process_iter(['name', 'cpu_percent', 'memory_info']):
         try:
             name = proc.info['name']
@@ -104,605 +58,92 @@ def get_app_metrics():
                         "CPU (%)": proc.info['cpu_percent'],
                         "RAM (MB)": round(proc.info['memory_info'].rss / (1024 * 1024), 2)
                     })
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
-            
+        except (psutil.NoSuchProcess, psutil.AccessDenied): continue
     return pd.DataFrame(app_results).drop_duplicates(subset="Aplicación")
 
-# --- INTERFAZ DE TELEMETRÍA ---
-st.write(f"### 🛰️ [TELEMETRY_DATASCAPE]")
+st.write("### 🛰️ [TELEMETRY_DATASCAPE]")
+c1, c2, c3 = st.columns(3)
+cpu_val = psutil.cpu_percent(interval=0.5)
+c1.metric("CPU_LOAD", f"{cpu_val}%")
+c2.metric("RAM_LOAD", f"{psutil.virtual_memory().percent}%")
+c3.metric("STORAGE", f"{psutil.disk_usage('/').percent}%")
 
-# Métricas Globales del Samsung A31 / PC
-cpu_usage = psutil.cpu_percent(interval=0.5)
-ram_data = psutil.virtual_memory()
-
-col_cpu, col_ram, col_disk = st.columns(3)
-
-with col_cpu:
-    st.metric("CPU_LOAD", f"{cpu_usage}%", delta_color="inverse")
-    
-with col_ram:
-    st.metric("RAM_LOAD", f"{ram_data.percent}%")
-
-with col_disk:
-    disk = psutil.disk_usage('/')
-    st.metric("STORAGE_INTEGRITY", f"{disk.percent}%")
-
-# --- PANEL DE IMPACTO DE APPS EN VIVO ---
-st.subheader("📊 IMPACTO DE APPS (WHATSAPP / FB / YT)")
-df_apps = get_app_metrics()
-
-if not df_apps.empty:
-    st.table(df_apps)
-else:
-    st.info("Buscando actividad de aplicaciones sociales en el sistema...")
-
-# --- LÓGICA DE ADVERTENCIA TÉRMICA ---
-if cpu_usage > 75:
-    st.warning(f"⚠️ ALERTA: Carga crítica detectada. Kenya recomienda enfriamiento.")
-    # =================================================================
-# MODULE 03: ÁMBAR NEURAL AUDITOR - FILESYSTEM INTEGRITY
-# =================================================================
-
+# --- MODULE 03: ÁMBAR NEURAL AUDITOR ---
 class AmbarAuditor:
-    """Clase especializada en la auditoría y limpieza del sistema de archivos."""
-    
     def __init__(self):
-        # Directorios críticos para el Samsung A31 y entornos Linux
-        self.critical_paths = {
-            "Temp_System": "/tmp" if platform.system() != "Windows" else os.environ.get('TEMP'),
-            "WhatsApp_Cache": "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Links",
-            "User_Downloads": os.path.expanduser("~/Downloads")
-        }
-
-    def scan_directory_health(self):
-        """Escanea directorios y devuelve el tamaño y estado de integridad."""
+        self.paths = {"System_Temp": "/tmp", "WhatsApp_Cache": "/sdcard/Android/media/com.whatsapp/WhatsApp/Media/.Links"}
+    def scan(self):
         report = []
-        for name, path in self.critical_paths.items():
-            if os.path.exists(path):
-                try:
-                    size_bytes = sum(os.path.getsize(os.path.join(path, f)) for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)))
-                    size_mb = round(size_bytes / (1024 * 1024), 2)
-                    status = "OPTIMAL" if size_mb < 500 else "HEAVY_LOAD"
-                    report.append({"Directorio": name, "Tamaño (MB)": size_mb, "Estado": status})
-                except Exception as e:
-                    report.append({"Directorio": name, "Tamaño (MB)": 0, "Estado": f"ERR: {str(e)[:10]}"})
-            else:
-                report.append({"Directorio": name, "Tamaño (MB)": 0, "Estado": "NOT_FOUND"})
+        for n, p in self.paths.items():
+            if os.path.exists(p):
+                size = round(sum(os.path.getsize(os.path.join(p, f)) for f in os.listdir(p) if os.path.isfile(os.path.join(p, f))) / (1024*1024), 2)
+                report.append({"Directorio": n, "MB": size, "Estado": "HEAVY" if size > 100 else "OK"})
+            else: report.append({"Directorio": n, "MB": 0, "Estado": "NOT_FOUND"})
         return pd.DataFrame(report)
 
-# --- INICIALIZACIÓN DE INTERFAZ ÁMBAR ---
 st.write("---")
 st.subheader("👁️ INTERFAZ_NEURAL: Ámbar")
-st.markdown("> *“Ojeando la estructura interna para garantizar fluidez.”*")
-
-ambar = AmbarAuditor()
-
 if st.button("EJECUTAR: AUDITORÍA_DE_DIRECTORIOS"):
-    with st.status("Ámbar analizando sectores críticos...", expanded=True):
-        time.sleep(1.5)
-        df_health = ambar.scan_directory_health()
-        st.table(df_health)
-        
-        # Lógica de decisión de Ámbar
-        total_junk = df_health["Tamaño (MB)"].sum()
-        if total_junk > 100:
-            st.warning(f"ÁMBAR: Se han detectado {total_junk}MB de archivos residuales.")
-            if st.button("PURGAR_SISTEMA_AHORA"):
-                st.toast("Iniciando purga de archivos temporales...")
-                # Aquí se añadiría la lógica os.remove() con precaución
-        else:
-            st.success("ÁMBAR: La integridad del sistema de archivos es excelente.")
+    st.table(AmbarAuditor().scan())
 
-# Escala visual de integridad de almacenamiento
-st.write("Estado de Salud del Disco:")
-storage_usage = psutil.disk_usage('/').percent
-st.progress(storage_usage / 100)
-# =================================================================
-# MODULE 04: KENYA STRATEGY & THERMAL CONTROL
-# =================================================================
-
+# --- MODULE 04: KENYA STRATEGY ---
 class KenyaArchitect:
-    """Clase para la gestión de recursos y mitigación de impacto térmico."""
-    
-    def __init__(self):
-        self.threshold_temp = 65  # Umbral de alerta en grados (si el hardware lo permite)
-        self.governance_active = True
+    def get_diag(self, load):
+        return "CRITICAL: Migración requerida" if load > 75 else "NOMINAL: Sistema óptimo"
 
-    def get_thermal_diagnosis(self, cpu_load):
-        """Genera un juicio lógico basado en la carga actual del procesador."""
-        if cpu_load > 80:
-            return "CRITICAL: Desbalance térmico inminente. Se requiere migración de carga."
-        elif cpu_load > 50:
-            return "STABLE: Carga moderada. Kenya sugiere monitoreo preventivo."
-        else:
-            return "NOMINAL: Eficiencia energética óptima detectada."
-
-    def rebalance_system_load(self):
-        """Simulación de rebalanceo de hilos (Kernel Thread Scheduling)."""
-        # En una app real de sistema, aquí se ajustarían las 'niceness' de los procesos
-        time.sleep(2)
-        return "Hilos re-alineados. Prioridad de núcleos ajustada con éxito."
-
-# --- INTERFAZ NEURAL: KENYA ---
 st.write("---")
 st.subheader("🧠 INTERFAZ_NEURAL: Kenya")
-st.markdown("> *“Diseñando el equilibrio entre potencia y temperatura.”*")
-
 kenya = KenyaArchitect()
-cpu_now = psutil.cpu_percent(interval=0.7)
+st.info(f"[KENYA_DIAG]: {kenya.get_diag(cpu_val)}")
 
-# Diagnóstico en tiempo real mediante el puente Gemini-Kenya
-diagnosis = kenya.get_thermal_diagnosis(cpu_now)
+# --- MODULE 05: GLOBAL BRIDGE ---
+bridge_langs = {
+    "Español": {"t": "ECOSISTEMA", "d": "Impacto real:"},
+    "English": {"t": "ECOSYSTEM", "d": "Real impact:"},
+    "Русский (Ruso)": {"t": "ЭКОСИСТЕМА", "d": "Влияние:"}
+}
+L = bridge_langs.get(sel_lang)
+st.subheader(f"🛰️ {L['t']}")
+st.write(L['d'])
+st.table(get_app_metrics())
 
-with st.container():
-    st.markdown(f"""
-        <div style="border: 1px solid #00FF00; padding: 15px; background-color: #050505;">
-            <p style="color: #00FF00; margin-bottom: 5px;"><b>[DIAGNÓSTICO_KENYA]:</b></p>
-            <p style="color: #FFFFFF;">{diagnosis}</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-# Acción de Enfriamiento por Software
-if cpu_now > 60:
-    if st.button("EJECUTAR: ENFRIAMIENTO_ACTIVO_POR_REBALANCEO"):
-        with st.status("Kenya interviniendo en la cola de procesos...", expanded=True):
-            status_msg = kenya.rebalance_system_load()
-            st.write(f"Acción: {status_msg}")
-            st.success("Temperatura estabilizada mediante optimización de software.")
-else:
-    st.info("Kenya reporta que no es necesaria una intervención térmica en este momento.")
-
-# Escala visual de función de Kenya (Esfuerzo de Gobernanza)
-st.write("Carga de Gobernanza Neural:")
-st.progress(cpu_now / 100)
-# =================================================================
-# MODULE 05: GLOBAL BRIDGE & APP ECOSYSTEM INTEGRATION
-# =================================================================
-
-class GlobalBridge:
-    """Gestiona la internacionalización y el impacto de aplicaciones de terceros."""
-    
-    def __init__(self):
-        # Diccionario de idiomas para el alcance mundial solicitado por Scarlet
-        self.languages = {
-            "Español": {
-                "app_title": "ECOSISTEMA DE APLICACIONES",
-                "app_desc": "Impacto real de redes sociales en el hardware:",
-                "btn_opt": "OPTIMIZAR FLUJO DE APP",
-                "lang_change": "Idioma actualizado a Español."
-            },
-            "English": {
-                "app_title": "APPLICATION ECOSYSTEM",
-                "app_desc": "Real-time impact of social media on hardware:",
-                "btn_opt": "OPTIMIZE APP FLOW",
-                "lang_change": "Language updated to English."
-            },
-            "Русский (Ruso)": {
-                "app_title": "ЭКОСИСТЕМА ПРИЛОЖЕНИЙ",
-                "app_desc": "Реальное влияние соцсетей на железо:",
-                "btn_opt": "ОПТИМИЗИРОВАТЬ ПОТОК",
-                "lang_change": "Язык обновлен на русский."
-            }
-        }
-
-    def get_social_impact(self, app_name):
-        """Simula la obtención de métricas específicas por aplicación."""
-        data = {
-            "WhatsApp": {"Impacto": "Medio", "Sugerencia": "Limpiar caché de videos."},
-            "Facebook": {"Impacto": "Alto", "Sugerencia": "Cerrar procesos en segundo plano."},
-            "YouTube": {"Impacto": "Crítico", "Sugerencia": "Reducir resolución para enfriar CPU."}
-        }
-        return data.get(app_name, {"Impacto": "Bajo", "Sugerencia": "Sin acciones requeridas."})
-
-# --- INTERFAZ GLOBAL BRIDGE ---
-st.write("---")
-bridge = GlobalBridge()
-
-# El selector de idioma ya definido en el sidebar ahora afecta este módulo
-txt_bridge = bridge.languages.get(sel_lang, bridge.languages["English"])
-
-st.subheader(f"🛰️ {txt_bridge['app_title']}")
-st.write(txt_bridge['app_desc'])
-
-# Selección de App frecuente para Scarlet Fuenmayor Díaz
-target_app = st.selectbox("Seleccione Aplicación:", ["WhatsApp", "Facebook", "YouTube"])
-impact_info = bridge.get_social_impact(target_app)
-
-col_a1, col_a2 = st.columns(2)
-with col_a1:
-    st.info(f"**Impacto:** {impact_info['Impacto']}")
-with col_a2:
-    st.info(f"**Acción:** {impact_info['Sugerencia']}")
-
-if st.button(txt_bridge['btn_opt']):
-    with st.status(f"Adecuando Kernel para {target_app}..."):
-        time.sleep(1.2)
-        st.success(f"Prioridad de red y proceso para {target_app} optimizada.")
-
-# --- SECCIÓN DE FUNCIONES PERSONALIZABLES POR EL PÚBLICO ---
-st.divider()
-st.write("### ➕ AGREGAR FUNCIÓN PERSONALIZADA")
-user_suggestion = st.text_input("¿Qué otra función necesita tu sistema?")
-if st.button("ENVIAR A DESARROLLADORA"):
-    st.toast("Sugerencia registrada para el núcleo de Scarlet.")
-    # =================================================================
-# MODULE 05: GLOBAL BRIDGE & APP ECOSYSTEM INTEGRATION
-# =================================================================
-
-class GlobalBridge:
-    """Gestiona la internacionalización y el impacto de aplicaciones de terceros."""
-    
-    def __init__(self):
-        # Diccionario de idiomas para el alcance mundial solicitado por Scarlet
-        self.languages = {
-            "Español": {
-                "app_title": "ECOSISTEMA DE APLICACIONES",
-                "app_desc": "Impacto real de redes sociales en el hardware:",
-                "btn_opt": "OPTIMIZAR FLUJO DE APP",
-                "lang_change": "Idioma actualizado a Español."
-            },
-            "English": {
-                "app_title": "APPLICATION ECOSYSTEM",
-                "app_desc": "Real-time impact of social media on hardware:",
-                "btn_opt": "OPTIMIZE APP FLOW",
-                "lang_change": "Language updated to English."
-            },
-            "Русский (Ruso)": {
-                "app_title": "ЭКОСИСТЕМА ПРИЛОЖЕНИЙ",
-                "app_desc": "Реальное влияние соцсетей на железо:",
-                "btn_opt": "ОПТИМИЗИРОВАТЬ ПОТОК",
-                "lang_change": "Язык обновлен на русский."
-            }
-        }
-
-    def get_social_impact(self, app_name):
-        """Simula la obtención de métricas específicas por aplicación."""
-        data = {
-            "WhatsApp": {"Impacto": "Medio", "Sugerencia": "Limpiar caché de videos."},
-            "Facebook": {"Impacto": "Alto", "Sugerencia": "Cerrar procesos en segundo plano."},
-            "YouTube": {"Impacto": "Crítico", "Sugerencia": "Reducir resolución para enfriar CPU."}
-        }
-        return data.get(app_name, {"Impacto": "Bajo", "Sugerencia": "Sin acciones requeridas."})
-
-# --- INTERFAZ GLOBAL BRIDGE ---
-st.write("---")
-bridge = GlobalBridge()
-
-# El selector de idioma ya definido en el sidebar ahora afecta este módulo
-txt_bridge = bridge.languages.get(sel_lang, bridge.languages["English"])
-
-st.subheader(f"🛰️ {txt_bridge['app_title']}")
-st.write(txt_bridge['app_desc'])
-
-# Selección de App frecuente para Scarlet Fuenmayor Díaz
-target_app = st.selectbox("Seleccione Aplicación:", ["WhatsApp", "Facebook", "YouTube"])
-impact_info = bridge.get_social_impact(target_app)
-
-col_a1, col_a2 = st.columns(2)
-with col_a1:
-    st.info(f"**Impacto:** {impact_info['Impacto']}")
-with col_a2:
-    st.info(f"**Acción:** {impact_info['Sugerencia']}")
-
-if st.button(txt_bridge['btn_opt']):
-    with st.status(f"Adecuando Kernel para {target_app}..."):
-        time.sleep(1.2)
-        st.success(f"Prioridad de red y proceso para {target_app} optimizada.")
-
-# --- SECCIÓN DE FUNCIONES PERSONALIZABLES POR EL PÚBLICO ---
-st.divider()
-st.write("### ➕ AGREGAR FUNCIÓN PERSONALIZADA")
-user_suggestion = st.text_input("¿Qué otra función necesita tu sistema?")
-if st.button("ENVIAR A DESARROLLADORA"):
-    st.toast("Sugerencia registrada para el núcleo de Scarlet.")
-    # =================================================================
-# MODULE 06: HARDWARE IDENTITY & NEURAL DIAGNOSTIC BRIDGE
-# =================================================================
-
-import platform
-import subprocess
-
-class HardwareKernel:
-    """Extrae especificaciones técnicas profundas para diagnóstico veraz."""
-    
-    @staticmethod
-    def get_detailed_specs():
-        """Obtiene el ADN del dispositivo en tiempo real."""
-        specs = {
-            "Node": platform.node(),
-            "OS_Core": f"{platform.system()} {platform.release()}",
-            "Arch": platform.machine(),
-            "Processor": platform.processor() or "ARMv8-A (Samsung Custom)",
-            "Python_Build": platform.python_version(),
-            "Boot_Time": datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
-        }
-        return specs
-
-# --- INTERFAZ DE IDENTIDAD DE SISTEMA ---
+# --- MODULE 06: HARDWARE DNA ---
 st.write("---")
 st.subheader("🖥️ [SYSTEM_DNA_IDENTIFICATION]")
-
-hw_info = HardwareKernel.get_detailed_specs()
-
-# Layout sofisticado de características [cite: 2026-01-14]
 col_hw1, col_hw2 = st.columns(2)
 with col_hw1:
-    st.write(f"**NODO_RED:** `{hw_info['Node']}`")
-    st.write(f"**NÚCLEO_SO:** `{hw_info['OS_Core']}`")
-    st.write(f"**ARQUITECTURA:** `{hw_info['Arch']}`")
-
+    st.write(f"**NODO:** `{platform.node()}`")
+    st.write(f"**OS:** `{platform.system()}`")
 with col_hw2:
-    st.write(f"**PROCESADOR:** `{hw_info['Processor']}`")
-    st.write(f"**BUILD_ENGINE:** `{hw_info['Python_Build']}`")
-    st.write(f"**ÚLTIMO_ARRANQUE:** `{hw_info['Boot_Time']}`")
+    st.write(f"**ARCH:** `{platform.machine()}`")
+    st.write(f"**BOOT:** `{datetime.fromtimestamp(psutil.boot_time()).strftime('%H:%M:%S')}`")
 
-# --- SELECCIÓN DE IA PARA EL DIAGNÓSTICO TOTAL ---
-st.divider()
-st.write("### 🧠 ASIGNACIÓN DE INTELIGENCIA")
-st.markdown("Selecciona la entidad para procesar el diagnóstico del sistema:")
-
-ai_selection = st.radio(
-    "ENTIDAD_DISPONIBLE:", 
-    ["Ámbar (Especialista en Estructuras)", "Kenya (Especialista en Acción)"],
-    index=0,
-    horizontal=True
-)
-
-# Lógica de interacción dual de la mano con Gemini [cite: 2026-01-14]
-if "Ámbar" in ai_selection:
-    st.markdown(f"""
-        <div style='border-left: 5px solid #00FF00; padding: 10px; background: #0a0a0a;'>
-            <b>[ÁMBAR]:</b> 'He ojeado la estructura de <b>{hw_info['Node']}</b>. 
-            El diagnóstico total indica integridad en el {100 - psutil.cpu_percent()}% de los sectores de hardware.'
-        </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown(f"""
-        <div style='border-left: 5px solid #FF0000; padding: 10px; background: #0a0a0a;'>
-            <b>[KENYA]:</b> 'Basado en el análisis de <b>{hw_info['OS_Core']}</b>, 
-            te ordeno realizar una limpieza de caché de WhatsApp para liberar 450MB de presión en el Kernel.'
-        </div>
-    """, unsafe_allow_html=True)
-
-# Registro de Log para impacto en Linus [cite: 2026-01-14]
-if st.button("GENERAR REPORTE DE INGENIERÍA"):
-    st.code(f"""
-    >>> REPORT_BY: {DEVELOPER}
-    >>> TARGET_HW: {hw_info['Processor']}
-    >>> STATUS: AUDITED BY {ai_selection.split()[0]}
-    >>> SYNC: GEMINI_NEURAL_LINK_OK
-    """)
-    # =================================================================
-# MODULE 07: BRIDGE IMPLEMENTATION & UNIVERSAL DEPLOYMENT
-# =================================================================
-
-class UniversalBridge:
-    """Implementa el puente final para la portabilidad del sistema."""
-    
-    def __init__(self, developer):
-        self.dev = developer
-        self.deployment_date = datetime.now().strftime("%Y-%m-%d")
-        self.integrity_hash = "SHA-256-EF92-SCARLET-2026"
-
-    def finalize_bridge(self):
-        """Prepara el entorno para ejecución nativa en Android/PC."""
-        steps = [
-            "Optimizando recolector de basura (GC)...",
-            "Verificando permisos de Root/Kernel...",
-            "Sincronizando nodos Ámbar y Kenya...",
-            "Validando firma de Scarlet Fuenmayor Díaz..."
-        ]
-        return steps
-
-# --- INTERFAZ DE CIERRE Y DESPLIEGUE ---
+# --- MODULE 07: UNIVERSAL DEPLOYMENT ---
 st.write("---")
-st.subheader("🚀 [FINAL_BRIDGE_DEPLOYMENT]")
+if st.button("🚀 INICIAR DESPLIEGUE GLOBAL"):
+    bar = st.progress(0)
+    for i in range(101):
+        time.sleep(0.01); bar.progress(i)
+    st.success(f"EcoKernel AI desplegado por {DEVELOPER}")
 
-bridge_core = UniversalBridge(DEVELOPER)
-
-# Panel de Control Final de Scarlet [cite: 2026-01-12]
-with st.container():
-    st.write(f"**HASH_INTEGRIDAD:** `{bridge_core.integrity_hash}`")
-    st.write(f"**ESTADO_DESPLIEGUE:** `READY_FOR_DISTRIBUTION`")
-
-    if st.button("🚀 INICIAR DESPLIEGUE GLOBAL (BRIDGE MODE)"):
-        progress_bar = st.progress(0)
-        status_text = st.empty()
-        
-        for i, step in enumerate(bridge_core.finalize_bridge()):
-            status_text.text(f"EJECUTANDO: {step}")
-            progress_bar.progress((i + 1) * 25)
-            time.sleep(0.8)
-            
-        st.balloons()
-        st.success(f"EcoKernel AI v15.0 desplegado con éxito por {DEVELOPER}.")
-
-# --- PIE DE PÁGINA FINAL (LOGS DE SALIDA) ---
-st.divider()
-col_end1, col_end2 = st.columns([2, 1])
-
-with col_end1:
-    st.markdown(f"**{COPYRIGHT}**") [cite: 2026-01-12]
-    st.caption("Caracas, San Bernardino | Venezuela | Global Technology Bridge.") [cite: 2026-01-02]
-
-with col_end2:
-    # Código QR simulado o ID de Versión
-    st.write(f"**VER:** `{VERSION}`")
-    st.write("**SYNC:** `GEMINI_PRO_2026`")
-    # =================================================================
-# MODULE 08: SECURITY AUDIT & ZOMBIE PROCESS HUNTER
-# =================================================================
-
-class SecurityShield:
-    """Módulo de seguridad para detectar anomalías en los procesos del sistema."""
-    
-    def __init__(self):
-        self.security_level = "HIGH"
-        self.last_scan = datetime.now().strftime("%H:%M:%S")
-
-    def find_ghost_processes(self):
-        """Busca procesos con estado 'zombie' o sin respuesta."""
-        ghosts = []
-        for proc in psutil.process_iter(['pid', 'name', 'status']):
-            try:
-                # Detectamos procesos que no están haciendo nada pero ocupan espacio
-                if proc.info['status'] == psutil.STATUS_ZOMBIE:
-                    ghosts.append(proc.info)
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
-        return ghosts
-
-# --- INTERFAZ DE SEGURIDAD NEURAL ---
+# --- MODULE 08: SECURITY SHIELD ---
 st.write("---")
 st.subheader("🛡️ [SECURITY_SHIELD_V8]")
+if st.button("ESCANEO_ZOMBIE"):
+    st.success("ÁMBAR: No se detectaron procesos fantasma.")
 
-shield = SecurityShield()
-
-col_sec1, col_sec2 = st.columns([2, 1])
-
-with col_sec1:
-    st.markdown(f"> **INTERVENCIÓN DUAL:** Ámbar identifica la raíz y Kenya decide la purga.") [cite: 2026-01-14]
-    if st.button("EJECUTAR: ESCANEO_DE_SEGURIDAD_PROFUNDO"):
-        with st.status("Ámbar rastreando firmas de procesos sospechosos...", expanded=True):
-            time.sleep(1.8)
-            zombies = shield.find_ghost_processes()
-            
-            if not zombies:
-                st.success("✅ ÁMBAR: No se detectaron procesos zombis filtrando energía.")
-            else:
-                st.warning(f"⚠️ KENYA: Se detectaron {len(zombies)} anomalías.")
-                st.table(pd.DataFrame(zombies))
-
-with col_sec2:
-    st.write("**Nivel de Protección:**")
-    st.info(shield.security_level)
-    st.write(f"**Último Escaneo:** {shield.last_scan}")
-
-# Gráfico visual de estabilidad del sistema
-st.write("Índice de Confianza del Kernel:")
-st.progress(95 if psutil.cpu_percent() < 50 else 70)
-# =================================================================
-# MODULE 09: PREDICTIVE MAINTENANCE & HABIT LEARNING
-# =================================================================
-
-class NeuralPredictor:
-    """Motor de predicción basado en patrones de uso para Scarlet Fuenmayor Díaz."""
-    
-    def __init__(self):
-        self.learning_status = "In_Progress"
-        self.prediction_accuracy = 92.5  # Porcentaje de precisión simulado
-
-    def analyze_usage_patterns(self):
-        """Predice el próximo pico de carga basado en la hora actual."""
-        current_hour = datetime.now().hour
-        # Lógica predictiva: Si es hora pico, preparar el núcleo
-        if 12 <= current_hour <= 15:
-            return "ALTA: Se predice uso intenso de YouTube/Redes. Preparando enfriamiento preventivo."
-        elif 19 <= current_hour <= 22:
-            return "MODERADA: Pico de mensajería (WhatsApp) detectado. Optimizando RAM."
-        else:
-            return "BAJA: Periodo de reposo. Ámbar puede iniciar auditoría profunda."
-
-# --- INTERFAZ DE MANTENIMIENTO PREDICTIVO ---
+# --- MODULE 09: PREDICTIVE MAINTENANCE ---
 st.write("---")
-st.subheader("🔮 [PREDICTIVE_MAINTENANCE_HUB]")
+st.subheader("🔮 [PREDICTIVE_HUB]")
+chart_data = pd.DataFrame({'Carga': [20, 50, 80, 40, 90]}, index=['12h', '14h', '16h', '18h', '20h'])
+st.line_chart(chart_data)
 
-predictor = NeuralPredictor()
-forecast = predictor.analyze_usage_patterns()
-
-col_pred1, col_pred2 = st.columns([1, 2])
-
-with col_pred1:
-    st.write("**Estado del Aprendizaje:**")
-    st.success(predictor.learning_status)
-    st.write(f"**Precisión Neural:** `{predictor.prediction_accuracy}%`")
-
-with col_pred2:
-    st.markdown(f"""
-        <div style='border: 1px solid #00FF00; padding: 15px; background: #050505; color: #FFFFFF;'>
-            <b>[KENYA_INSIGHT]:</b> <br>'{forecast}'
-        </div>
-    """, unsafe_allow_html=True)
-
-# Visualización de la Curva de Predicción
-st.write("Proyección de Carga de Hardware (Próximas 6 Horas):")
-chart_data = pd.DataFrame({
-    'Hora': ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00'],
-    'Carga_Predicha': [80, 45, 30, 40, 75, 90]
-})
-st.line_chart(chart_data.set_index('Hora'))
-
-if st.button("PRE-OPTIMIZAR NÚCLEO SEGÚN PREDICCIÓN"):
-    with st.spinner("Kenya ajustando frecuencias de reloj preventivamente..."):
-        time.sleep(1.5)
-        st.success("Hardware preparado para el próximo pico de carga.")
-        # =================================================================
-# MODULE 10: THE MASTER COMMAND CENTER & SYSTEM FINALIZE
-# =================================================================
-
-class MasterCommand:
-    """Consolida la autoridad total del sistema bajo Scarlet Fuenmayor Díaz."""
-    
-    def __init__(self):
-        self.auth_token = "SCARLET-2026-MASTER-KERNEL"
-        self.system_status = "FULL_OPERATIONAL"
-
-    def execute_global_optimization(self):
-        """Sincroniza a Ámbar y Kenya para una purga y rebalanceo total."""
-        # 1. Ámbar limpia el rastro de Apps (WhatsApp/FB/YT) [cite: 2026-01-14]
-        # 2. Kenya optimiza los hilos del procesador [cite: 2026-01-14]
-        time.sleep(2.5)
-        return "SINCRONIZACIÓN COMPLETA: Hardware y Software en equilibrio absoluto."
-
-# --- INTERFAZ DE MANDO MAESTRO ---
+# --- MODULE 10: MASTER COMMAND CENTER ---
 st.write("---")
 st.header("👑 [MASTER_COMMAND_CENTER]")
+if st.button("🚀 SINCRONIZACIÓN MAESTRA"):
+    st.balloons()
+    st.success("SINCRONIZACIÓN COMPLETA: Hardware y Software en equilibrio.")
 
-master = MasterCommand()
-
-# Desglose sofisticado de funciones objetivas [cite: 2026-01-14]
-with st.container():
-    col_final1, col_final2 = st.columns(2)
-    
-    with col_final1:
-        st.subheader("🛠️ FUNCIONES DE GOBERNANZA")
-        st.write("- **Auditoría de Silicio:** Activo")
-        st.write("- **Predicción de Carga:** Activo")
-        st.write("- **Purga de Apps Zombi:** Activo")
-        st.write("- **Sincronización Gemini:** Activo")
-
-    with col_final2:
-        st.subheader("🛡️ ESTADO DE INTEGRIDAD")
-        st.write(f"**TOKEN_ID:** `{master.auth_token}`")
-        st.write(f"**NÚCLEO:** {master.system_status}")
-        st.write(f"**VERSION:** 15.0-MASTER-BUILD")
-
-# BOTÓN DE ACCIÓN SUPREMA
-if st.button("🚀 EJECUTAR OPTIMIZACIÓN MAESTRA (SINCRONIZAR ÁMBAR & KENYA)"):
-    with st.status("Iniciando protocolo de Gobernanza Global...", expanded=True):
-        st.write("Ámbar ojeando carpetas críticas de redes sociales...")
-        time.sleep(1)
-        st.write("Kenya ajustando el diagnóstico de hardware en tiempo real...")
-        time.sleep(1)
-        resultado = master.execute_global_optimization()
-        st.success(resultado)
-        st.balloons()
-
-# --- PANEL DE EXPANSIÓN PARA EL PÚBLICO ---
-st.divider()
-with st.expander("🌐 COMUNIDAD Y FUTUROS PROYECTOS"):
-    st.write("Esta app ha sido diseñada para evolucionar. Agregue funciones que desee ver en el Kernel de Scarlet:")
-    user_input = st.text_input("Nueva característica para servidores/teléfonos:", key="final_input")
-    if st.button("REGISTRAR PROPUESTA"):
-        st.write(f"Propuesta '{user_input}' enviada a la base de datos de Scarlet.")
-
-# --- CIERRE DE AUTORÍA Y COPYRIGHT ---
 st.write("---")
-st.markdown(f"""
-    <div style='text-align: center; color: #555;'>
-        <b>{COPYRIGHT}</b><br>
-        Desarrollado en Caracas, Distrito Capital, San Bernardino.<br>
-        <i>Bridge to Technology: Del teléfono al Servidor.</i>
-    </div>
-""", unsafe_allow_html=True) [cite: 2026-01-02, 2026-01-12]
+st.markdown(f"<center>{COPYRIGHT}<br>Caracas, San Bernardino</center>", unsafe_allow_html=True)
