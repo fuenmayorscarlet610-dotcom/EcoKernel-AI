@@ -13,102 +13,81 @@ import hashlib
 import subprocess
 from datetime import datetime
 
-# --- CONFIGURACIÓN DE NUCLEO ---
+# --- AJUSTE DE PANTALLA PARA MÓVIL (A31) ---
 st.set_page_config(page_title="EcoKernel | Scarlet Fuenmayor", layout="wide")
 
-# --- FUNCIONES DE EJECUCIÓN REAL ---
-def get_real_junk():
-    """Escaneo real de directorios temporales del sistema operativo"""
-    temp_dir = "/tmp" if platform.system() != "Windows" else os.environ.get('TEMP')
-    junk_files = []
-    total_size = 0
-    if temp_dir and os.path.exists(temp_dir):
-        for root, dirs, files in os.walk(temp_dir):
+# --- FUNCIONES DE ACCIÓN DIRECTA ---
+def execute_system_purge():
+    """Busca y elimina archivos reales en el servidor"""
+    temp_path = "/tmp" 
+    files_cleaned = 0
+    if os.path.exists(temp_path):
+        for root, dirs, files in os.walk(temp_path):
             for f in files:
                 try:
-                    fp = os.path.join(root, f)
-                    total_size += os.path.getsize(fp)
-                    junk_files.append(fp)
+                    os.remove(os.path.join(root, f))
+                    files_cleaned += 1
                 except: continue
-            if len(junk_files) > 1000: break # Seguridad para no saturar
-    return total_size, junk_files
+            if files_cleaned > 50: break # Seguridad
+    return files_cleaned
 
-def run_stark_shell(command):
-    """Ejecución directa en la terminal del sistema"""
-    try:
-        # Ejecuta el comando y captura la salida real
-        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
-        return output.decode('utf-8')
-    except subprocess.CalledProcessError as e:
-        return f"ERROR_DE_KERNEL: {e.output.decode('utf-8')}"
-    except Exception as e:
-        return f"FALLA_CRITICA: {str(e)}"
-
-# --- INTERFAZ STARK INDUSTRIAL ---
+# --- ESTILOS STARK PARA MÓVIL ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap');
     .stApp { background-color: #000000; color: #00FF00; font-family: 'JetBrains Mono', monospace; }
-    .stark-header { font-family: 'Orbitron'; text-align: center; color: #00FF00; text-shadow: 0 0 15px #00FF00; padding: 20px; }
-    .console-box { background: #080808; border: 1px solid #00FF00; padding: 15px; border-radius: 5px; color: #00FF00; }
+    .stark-title { font-family: 'Orbitron'; font-size: 2.5rem; text-align: center; color: #00FF00; text-shadow: 0 0 10px #00FF00; }
+    /* Botones más grandes para dedos en móvil */
+    .stButton>button { width: 100%; height: 3.5rem; border: 1px solid #00FF00; background-color: rgba(0,255,0,0.1); color: #00FF00; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<h1 class="stark-header">ECOKERNEL v3.0</h1>', unsafe_allow_html=True)
-st.write(f"**OPERADOR:** Scarlet Fuenmayor | **NODO:** {platform.node()} | **SISTEMA:** {platform.system()}")
+st.markdown('<h1 class="stark-title">ECOKERNEL</h1>', unsafe_allow_html=True)
+st.write(f"<center><b>MASTER ARCHITECT: SCARLET FUENMAYOR</b><br>Samsung A31 Control Node</center>", unsafe_allow_html=True)
 
-# --- PANEL DE CONTROL ---
-tab_sys, tab_net, tab_sec = st.tabs(["🚀 SISTEMA Y PURGA", "🌐 RED Y GPS", "🔐 STARK-SHELL"])
+# --- MENÚ TÁCTIL ---
+tab1, tab2, tab3 = st.tabs(["🚀 ACCIÓN", "📊 RADAR", "⌨️ SHELL"])
 
-# 1. GESTIÓN DE SISTEMA (KENYA & ÁMBAR)
-with tab_sys:
+# TAB 1: ACCIÓN REAL (KENYA & ÁMBAR)
+with tab1:
     st.subheader("⚡ Purga de Nodo (Kenya)")
-    size, files = get_real_junk()
-    c1, c2 = st.columns(2)
-    c1.metric("BASURA REAL DETECTADA", f"{size / (1024*1024):.2f} MB")
-    
+    st.info("Esta acción elimina archivos temporales reales del servidor de despliegue.")
     if st.button("EJECUTAR PURGA FÍSICA"):
-        count = 0
-        progress = st.progress(0)
-        for i, f in enumerate(files[:200]): # Borra los primeros 200
-            try:
-                if os.path.isfile(f):
-                    os.remove(f)
-                    count += 1
-                progress.progress((i + 1) / 200)
-            except: continue
-        st.success(f"PROCESO COMPLETADO: {count} archivos eliminados físicamente del servidor.")
+        with st.spinner("Kenya operando..."):
+            count = execute_system_purge()
+            time.sleep(1)
+            st.success(f"NÚCLEO LIMPIO: {count} archivos eliminados físicamente.")
+            st.balloons()
 
-# 2. RED Y TRÁFICO (MONITOR REAL)
-with tab_net:
-    st.subheader("🌐 Telemetría de Red")
-    net1 = psutil.net_io_counters()
-    time.sleep(0.5)
-    net2 = psutil.net_io_counters()
+# TAB 2: RADAR DE RED (PLOTLY REAL)
+with tab2:
+    st.subheader("🌐 Tráfico de Datos")
+    net = psutil.net_io_counters()
     
-    upspeed = (net2.bytes_sent - net1.bytes_sent) / 1024
-    downspeed = (net2.bytes_recv - net1.bytes_recv) / 1024
-    
-    st.write(f"**Velocidad Actual:** ⬆️ {upspeed:.2f} KB/s | ⬇️ {downspeed:.2f} KB/s")
-    
-    # Gráfico Real Plotly
-    fig = go.Figure(data=[go.Bar(x=['Upload', 'Download'], y=[upspeed, downspeed], marker_color='#00FF00')])
-    fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font_color='#00FF00', height=300)
+    # Gráfico optimizado para pantalla vertical de A31
+    fig = go.Figure(data=[
+        go.Bar(name='Bytes', x=['Subida', 'Descarga'], y=[net.bytes_sent, net.bytes_recv], marker_color='#00FF00')
+    ])
+    fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font_color='#00FF00', height=350, margin=dict(l=10, r=10, t=10, b=10))
     st.plotly_chart(fig, use_container_width=True)
 
-# 3. STARK-SHELL (COMANDOS REALES)
-with tab_sec:
-    st.subheader("⌨️ Stark-Shell: Acceso Root")
-    command = st.text_input("Ingrese comando de sistema (ej: ls -la, df -h, whoami):")
-    if st.button("EJECUTAR"):
-        if command:
-            resultado = run_stark_shell(command)
-            st.markdown('<div class="console-box">', unsafe_allow_html=True)
+# TAB 3: STARK-SHELL (COMANDOS REALES)
+with tab3:
+    st.subheader("⌨️ Consola de Sistema")
+    cmd = st.text_input("Ingrese comando (ej: ls, whoami, uname -a):")
+    if st.button("EJECUTAR COMANDO"):
+        try:
+            # Ejecución real en el servidor
+            resultado = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT).decode()
             st.code(resultado, language="bash")
-            st.markdown('</div>', unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"Kernel bloqueado o comando inválido: {e}")
 
-# --- FOOTER ---
-st.sidebar.markdown("### 📊 RECURSOS REALES")
-st.sidebar.write(f"CPU: {psutil.cpu_percent()}%")
-st.sidebar.write(f"RAM: {psutil.virtual_memory().percent}%")
-if st.sidebar.button("HARD RESET"): st.rerun()
+# --- MONITOR LATERAL (PARA MÓVIL SE VE ABAJO) ---
+st.write("---")
+st.markdown("### 📊 ESTADO DE HARDWARE")
+c1, c2 = st.columns(2)
+c1.metric("CPU", f"{psutil.cpu_percent()}%")
+c2.metric("RAM", f"{psutil.virtual_memory().percent}%")
+
+st.markdown(f"<p style='text-align:center; opacity:0.3; font-size:0.6em;'>© 2026 SCARLET FUENMAYOR | A31_MOBILE_INTERFACE</p>", unsafe_allow_html=True)
