@@ -7,144 +7,108 @@ import base64
 import time
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
+import numpy as np
 import requests
 import hashlib
 import subprocess
-import numpy as np
 from datetime import datetime
 
-# --- CONFIGURACIÓN DE NÚCLEO ---
-st.set_page_config(page_title="EcoKernel | Scarlet Fuenmayor", page_icon="⚡", layout="wide")
+# --- CONFIGURACIÓN DE NUCLEO ---
+st.set_page_config(page_title="EcoKernel | Scarlet Fuenmayor", layout="wide")
 
-# --- ESTILOS STARK INDUSTRIAL ---
+# --- FUNCIONES DE EJECUCIÓN REAL ---
+def get_real_junk():
+    """Escaneo real de directorios temporales del sistema operativo"""
+    temp_dir = "/tmp" if platform.system() != "Windows" else os.environ.get('TEMP')
+    junk_files = []
+    total_size = 0
+    if temp_dir and os.path.exists(temp_dir):
+        for root, dirs, files in os.walk(temp_dir):
+            for f in files:
+                try:
+                    fp = os.path.join(root, f)
+                    total_size += os.path.getsize(fp)
+                    junk_files.append(fp)
+                except: continue
+            if len(junk_files) > 1000: break # Seguridad para no saturar
+    return total_size, junk_files
+
+def run_stark_shell(command):
+    """Ejecución directa en la terminal del sistema"""
+    try:
+        # Ejecuta el comando y captura la salida real
+        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+        return output.decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return f"ERROR_DE_KERNEL: {e.output.decode('utf-8')}"
+    except Exception as e:
+        return f"FALLA_CRITICA: {str(e)}"
+
+# --- INTERFAZ STARK INDUSTRIAL ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@300&display=swap');
-    .stApp { background-color: #000000 !important; color: #00FF00 !important; font-family: 'JetBrains Mono', monospace; }
-    .stark-h1 {
-        font-family: 'Orbitron', sans-serif !important; font-size: clamp(2rem, 10vw, 5rem) !important;
-        letter-spacing: 15px; text-shadow: 0px 0px 20px #00FF00; text-align: center; margin: 0;
-    }
-    .file-node { background: rgba(0,255,0,0.05); border: 1px solid #00FF00; padding: 10px; margin: 2px; border-radius: 3px; font-size: 0.8em; }
-    .function-guide { text-align: center; font-family: 'Orbitron'; letter-spacing: 5px; color: #FFF; border-bottom: 1px solid #00FF00; padding: 10px; margin-bottom: 20px; }
-    .stMetric { background: rgba(0,255,0,0.05); border-radius: 10px; padding: 10px; border: 1px solid rgba(0,255,0,0.2); }
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap');
+    .stApp { background-color: #000000; color: #00FF00; font-family: 'JetBrains Mono', monospace; }
+    .stark-header { font-family: 'Orbitron'; text-align: center; color: #00FF00; text-shadow: 0 0 15px #00FF00; padding: 20px; }
+    .console-box { background: #080808; border: 1px solid #00FF00; padding: 15px; border-radius: 5px; color: #00FF00; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA ---
-st.markdown('<h1 class="stark-h1">ECOKERNEL</h1>', unsafe_allow_html=True)
-st.markdown(f'<p style="text-align:center; letter-spacing:5px; color:#FFF; font-size:0.8em;">ARCHITECT: SCARLET FUENMAYOR | CARACAS NODE</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="stark-header">ECOKERNEL v3.0</h1>', unsafe_allow_html=True)
+st.write(f"**OPERADOR:** Scarlet Fuenmayor | **NODO:** {platform.node()} | **SISTEMA:** {platform.system()}")
 
-# --- SISTEMA DE NAVEGACIÓN ---
-tab1, tab2, tab3, tab4 = st.tabs(["🚀 GESTIÓN", "🌐 RED & GPS", "🔐 SEGURIDAD", "🧠 NEURAL"])
+# --- PANEL DE CONTROL ---
+tab_sys, tab_net, tab_sec = st.tabs(["🚀 SISTEMA Y PURGA", "🌐 RED Y GPS", "🔐 STARK-SHELL"])
 
-# --- TAB 1: GESTIÓN (KENYA & ÁMBAR) ---
-with tab1:
-    st.markdown('<p class="function-guide">OPTIMIZACIÓN DE NODO</p>', unsafe_allow_html=True)
+# 1. GESTIÓN DE SISTEMA (KENYA & ÁMBAR)
+with tab_sys:
+    st.subheader("⚡ Purga de Nodo (Kenya)")
+    size, files = get_real_junk()
     c1, c2 = st.columns(2)
+    c1.metric("BASURA REAL DETECTADA", f"{size / (1024*1024):.2f} MB")
     
-    with c1:
-        st.subheader("📂 Explorador (Ámbar)")
-        path = st.text_input("Ruta:", value=os.getcwd())
-        try:
-            files = os.listdir(path)
-            for f in files[:10]:
-                st.markdown(f'<div class="file-node">📄 {f}</div>', unsafe_allow_html=True)
-        except: st.error("Acceso de lectura restringido por el Kernel.")
-
-    with c2:
-        st.subheader("⚡ Purga (Kenya)")
-        st.metric("ESTADO DEL SISTEMA", "NODO ACTIVO")
-        if st.button("EJECUTAR LIMPIEZA DE CACHÉ"):
-            with st.spinner("Kenya eliminando temporales..."):
-                time.sleep(1)
-                st.success("Sectores liberados. 0.00MB residuales.")
-
-# --- TAB 2: RED & GPS ---
-with tab2:
-    st.markdown('<p class="function-guide">INTELIGENCIA DE RED</p>', unsafe_allow_html=True)
-    
-    # Simulación de tráfico para evitar esperas de carga
-    net_io = psutil.net_io_counters()
-    col_n1, col_n2 = st.columns(2)
-    col_n1.metric("SUBIDA TOTAL", f"{net_io.bytes_sent / 1024**2:.2f} MB")
-    col_n2.metric("DESCARGA TOTAL", f"{net_io.bytes_recv / 1024**2:.2f} MB")
-
-    # Mapa de Geoposicionamiento
-    try:
-        intel = requests.get('https://ipapi.co/json/', timeout=5).json()
-        lat, lon = intel.get('latitude'), intel.get('longitude')
-        
-        fig_map = go.Figure(go.Scattermapbox(
-            lat=[lat], lon=[lon], mode='markers',
-            marker=dict(size=15, color='#00FF00'),
-            text=[f"Nodo: {intel.get('city')}"]
-        ))
-        fig_map.update_layout(
-            mapbox_style="carto-darkmatter", # Estilo estable sin Token
-            mapbox=dict(center=dict(lat=lat, lon=lon), zoom=5),
-            margin=dict(l=0,r=0,t=0,b=0), height=300, paper_bgcolor='black'
-        )
-        st.plotly_chart(fig_map, use_container_width=True)
-    except:
-        st.warning("Satélite GPS no disponible temporalmente.")
-
-# --- TAB 3: SEGURIDAD & SHELL ---
-with tab3:
-    st.markdown('<p class="function-guide">STARK SHELL & CRIPTOGRAFÍA</p>', unsafe_allow_html=True)
-    
-    c_s1, c_s2 = st.columns(2)
-    
-    with c_s1:
-        st.subheader("🔐 Scarlet-Lock")
-        msg = st.text_input("Mensaje Secreto:", type="password")
-        if st.button("Cifrar"):
-            h = hashlib.sha256(msg.encode()).hexdigest()[:16]
-            st.code(f"SCARLET_HASH: {h}")
-
-    with c_s2:
-        st.subheader("⌨️ Stark-Shell")
-        cmd = st.text_input("Comando (ls/dir):")
-        if cmd:
+    if st.button("EJECUTAR PURGA FÍSICA"):
+        count = 0
+        progress = st.progress(0)
+        for i, f in enumerate(files[:200]): # Borra los primeros 200
             try:
-                # Limitamos ejecución por seguridad en la nube
-                res = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT).decode()
-                st.code(res)
-            except: st.error("Comando bloqueado por el Firewall.")
+                if os.path.isfile(f):
+                    os.remove(f)
+                    count += 1
+                progress.progress((i + 1) / 200)
+            except: continue
+        st.success(f"PROCESO COMPLETADO: {count} archivos eliminados físicamente del servidor.")
 
-# --- TAB 4: NEURAL (DIAGNÓSTICO TONY STARK) ---
-with tab4:
-    st.markdown('<p class="function-guide">NEURAL-VISOR DEEP SCAN</p>', unsafe_allow_html=True)
+# 2. RED Y TRÁFICO (MONITOR REAL)
+with tab_net:
+    st.subheader("🌐 Telemetría de Red")
+    net1 = psutil.net_io_counters()
+    time.sleep(0.5)
+    net2 = psutil.net_io_counters()
     
-    # Datos de Hardware con control de errores para la nube
-    c_h1, c_h2 = st.columns([1, 2])
+    upspeed = (net2.bytes_sent - net1.bytes_sent) / 1024
+    downspeed = (net2.bytes_recv - net1.bytes_recv) / 1024
     
-    with c_h1:
-        st.write("🧬 **Arquitectura:**", platform.machine())
-        st.write("🧠 **Núcleos:**", psutil.cpu_count(), "Threads")
-        # Control de temperatura (falla en muchos servidores cloud)
-        st.metric("CARGA CPU", f"{psutil.cpu_percent()}%")
-        
-    with c_h2:
-        # Gráfico 3D Neural
-        n = 15
-        x, y, z = np.random.rand(3, n)
-        fig_3d = go.Figure(data=[go.Scatter3d(
-            x=x, y=y, z=z, mode='markers+lines',
-            marker=dict(size=4, color='#00FF00'),
-            line=dict(color='#FFFFFF', width=1)
-        )])
-        fig_3d.update_layout(
-            scene=dict(xaxis_visible=False, yaxis_visible=False, zaxis_visible=False, bgcolor="black"),
-            paper_bgcolor='black', margin=dict(l=0,r=0,t=0,b=0), height=400
-        )
-        st.plotly_chart(fig_3d, use_container_width=True)
+    st.write(f"**Velocidad Actual:** ⬆️ {upspeed:.2f} KB/s | ⬇️ {downspeed:.2f} KB/s")
+    
+    # Gráfico Real Plotly
+    fig = go.Figure(data=[go.Bar(x=['Upload', 'Download'], y=[upspeed, downspeed], marker_color='#00FF00')])
+    fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font_color='#00FF00', height=300)
+    st.plotly_chart(fig, use_container_width=True)
 
-# --- BOTÓN MODO DIOS ---
-if st.button("ACTIVATE OVERDRIVE PROTOCOL", use_container_width=True):
-    st.snow()
-    st.success("PROTOCOL 'SCARLET-SUPREMACY' ENGAGED.")
+# 3. STARK-SHELL (COMANDOS REALES)
+with tab_sec:
+    st.subheader("⌨️ Stark-Shell: Acceso Root")
+    command = st.text_input("Ingrese comando de sistema (ej: ls -la, df -h, whoami):")
+    if st.button("EJECUTAR"):
+        if command:
+            resultado = run_stark_shell(command)
+            st.markdown('<div class="console-box">', unsafe_allow_html=True)
+            st.code(resultado, language="bash")
+            st.markdown('</div>', unsafe_allow_html=True)
 
 # --- FOOTER ---
-st.markdown(f"<p style='text-align:center; opacity:0.3; font-size:0.7em; margin-top:50px;'>© 2026 SCARLET FUENMAYOR | NODE_ACTIVE: {datetime.now().strftime('%H:%M:%S')}</p>", unsafe_allow_html=True)
+st.sidebar.markdown("### 📊 RECURSOS REALES")
+st.sidebar.write(f"CPU: {psutil.cpu_percent()}%")
+st.sidebar.write(f"RAM: {psutil.virtual_memory().percent}%")
+if st.sidebar.button("HARD RESET"): st.rerun()
