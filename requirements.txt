@@ -2,3 +2,5 @@ streamlit
 psutil
 pandas
 plotly
+numpy
+requests
