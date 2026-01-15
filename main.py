@@ -2,24 +2,21 @@
 # ECOKERNEL - GLOBAL GOVERNANCE CORE (REAL SYSTEM PURGE)
 # AUTHOR: SCARLET FUENMAYOR DÍAZ
 # COPYRIGHT: © 2026 Scarlet Fuenmayor
-# =================================================================
-
 import streamlit as st
 import psutil
 import platform
 import os
 import shutil
-import base64        # Necesario para el logo y Scarlet-Lock
+import base64
 import time
 import pandas as pd
-import plotly.graph_objects as go  # Soluciona el error de tus fotos
+import plotly.graph_objects as go
 import plotly.express as px
-import requests      # Necesario para el rastreo de IP
-import hashlib       # Necesario para el cifrado
-import subprocess    # Necesario para la Stark-Shell
-import numpy as np   # Necesario para el visor 3D
+import requests
+import hashlib
+import subprocess
+import numpy as np
 from datetime import datetime
-
 # --- CONFIGURACIÓN DE NÚCLEO ---
 st.set_page_config(page_title="EcoKernel | Scarlet Fuenmayor", page_icon="⚡", layout="wide")
 
