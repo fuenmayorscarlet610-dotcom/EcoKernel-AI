@@ -9,9 +9,15 @@ import psutil
 import platform
 import os
 import shutil
-import base64
+import base64        # Necesario para el logo y Scarlet-Lock
 import time
-import pandas as pd 
+import pandas as pd
+import plotly.graph_objects as go  # Soluciona el error de tus fotos
+import plotly.express as px
+import requests      # Necesario para el rastreo de IP
+import hashlib       # Necesario para el cifrado
+import subprocess    # Necesario para la Stark-Shell
+import numpy as np   # Necesario para el visor 3D
 from datetime import datetime
 
 # --- CONFIGURACIÓN DE NÚCLEO ---
