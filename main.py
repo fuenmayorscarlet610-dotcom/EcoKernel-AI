@@ -1,6 +1,3 @@
-# =================================================================
-# ECOKERNEL - GLOBAL GOVERNANCE CORE (REAL SYSTEM PURGE)
-# AUTHOR: SCARLET FUENMAYOR DÍAZ
 import streamlit as st
 import psutil
 import platform
