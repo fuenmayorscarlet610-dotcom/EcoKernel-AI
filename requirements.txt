@@ -1,6 +1,6 @@
 streamlit
 psutil
-pandas
 plotly
-numpy
+pandas
 requests
+numpy
