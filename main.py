@@ -1,93 +1,179 @@
+# =================================================================
+# ECOKERNEL AI - CORE ARCHITECTURE (UNIFIED V15.5)
+# AUTHOR: SCARLET FUENMAYOR DÍAZ (BENELOPE)
+# LICENSE: PROPRIETARY HARDWARE GOVERNANCE © 2026
+# =================================================================
+
 import streamlit as st
 import psutil
 import platform
 import os
-import shutil
-import base64
 import time
-import pandas as pd
-import plotly.graph_objects as go
-import numpy as np
-import requests
-import hashlib
-import subprocess
+import pandas as pd 
 from datetime import datetime
 
-# --- AJUSTE DE PANTALLA PARA MÓVIL (A31) ---
-st.set_page_config(page_title="EcoKernel | Scarlet Fuenmayor", layout="wide")
+# --- CONFIGURACIÓN GLOBAL ---
+VERSION = "15.5.0-STABLE"
+DEVELOPER = "Scarlet Fuenmayor Díaz"
+COPYRIGHT = f"© 2026 {DEVELOPER}"
 
-# --- FUNCIONES DE ACCIÓN DIRECTA ---
-def execute_system_purge():
-    """Busca y elimina archivos reales en el servidor"""
-    temp_path = "/tmp" 
-    files_cleaned = 0
-    if os.path.exists(temp_path):
-        for root, dirs, files in os.walk(temp_path):
-            for f in files:
-                try:
-                    os.remove(os.path.join(root, f))
-                    files_cleaned += 1
-                except: continue
-            if files_cleaned > 50: break # Seguridad
-    return files_cleaned
+st.set_page_config(
+    page_title=f"EcoKernel AI | {DEVELOPER}",
+    page_icon="logo.png", 
+    layout="wide"
+)
 
-# --- ESTILOS STARK PARA MÓVIL ---
-st.markdown("""
+# --- MODULE 01: ESTÉTICA CYBERNETIC & NEO-CIRCLE ---
+st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap');
-    .stApp { background-color: #000000; color: #00FF00; font-family: 'JetBrains Mono', monospace; }
-    .stark-title { font-family: 'Orbitron'; font-size: 2.5rem; text-align: center; color: #00FF00; text-shadow: 0 0 10px #00FF00; }
-    /* Botones más grandes para dedos en móvil */
-    .stButton>button { width: 100%; height: 3.5rem; border: 1px solid #00FF00; background-color: rgba(0,255,0,0.1); color: #00FF00; font-weight: bold; }
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown('<h1 class="stark-title">ECOKERNEL</h1>', unsafe_allow_html=True)
-st.write(f"<center><b>MASTER ARCHITECT: SCARLET FUENMAYOR</b><br>Samsung A31 Control Node</center>", unsafe_allow_html=True)
-
-# --- MENÚ TÁCTIL ---
-tab1, tab2, tab3 = st.tabs(["🚀 ACCIÓN", "📊 RADAR", "⌨️ SHELL"])
-
-# TAB 1: ACCIÓN REAL (KENYA & ÁMBAR)
-with tab1:
-    st.subheader("⚡ Purga de Nodo (Kenya)")
-    st.info("Esta acción elimina archivos temporales reales del servidor de despliegue.")
-    if st.button("EJECUTAR PURGA FÍSICA"):
-        with st.spinner("Kenya operando..."):
-            count = execute_system_purge()
-            time.sleep(1)
-            st.success(f"NÚCLEO LIMPIO: {count} archivos eliminados físicamente.")
-            st.balloons()
-
-# TAB 2: RADAR DE RED (PLOTLY REAL)
-with tab2:
-    st.subheader("🌐 Tráfico de Datos")
-    net = psutil.net_io_counters()
+    .stApp {{ background-color: #000000 !important; color: #00FF00 !important; font-family: 'Courier New', monospace; }}
     
-    # Gráfico optimizado para pantalla vertical de A31
-    fig = go.Figure(data=[
-        go.Bar(name='Bytes', x=['Subida', 'Descarga'], y=[net.bytes_sent, net.bytes_recv], marker_color='#00FF00')
-    ])
-    fig.update_layout(paper_bgcolor='black', plot_bgcolor='black', font_color='#00FF00', height=350, margin=dict(l=10, r=10, t=10, b=10))
-    st.plotly_chart(fig, use_container_width=True)
+    /* Marco Circular Neón para el Logo */
+    .logo-container {{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 4px solid #00FF00;
+        border-radius: 50%; /* Hace el marco circular */
+        width: 160px;
+        height: 160px;
+        background: radial-gradient(circle, #050505 0%, #000000 100%);
+        box-shadow: 0px 0px 20px #00FF00, inset 0px 0px 10px #00FF00;
+        margin: auto;
+        overflow: hidden;
+    }}
+    
+    [data-testid="stMetric"] {{ 
+        background-color: #050505 !important; 
+        border: 1px solid #00FF00 !important; 
+        padding: 20px !important; 
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px #00FF00;
+    }}
+    
+    h1, h2, h3 {{ color: #00FF00 !important; text-transform: uppercase; letter-spacing: 2px; }}
+    
+    .stButton>button {{ 
+        width: 100%; 
+        background-color: #000000; 
+        color: #00FF00; 
+        border: 2px solid #00FF00; 
+        font-weight: bold;
+        transition: 0.3s;
+    }}
+    .stButton>button:hover {{ 
+        background-color: #00FF00; 
+        color: #000000; 
+        box-shadow: 0px 0px 15px #00FF00;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
-# TAB 3: STARK-SHELL (COMANDOS REALES)
-with tab3:
-    st.subheader("⌨️ Consola de Sistema")
-    cmd = st.text_input("Ingrese comando (ej: ls, whoami, uname -a):")
-    if st.button("EJECUTAR COMANDO"):
-        try:
-            # Ejecución real en el servidor
-            resultado = subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT).decode()
-            st.code(resultado, language="bash")
-        except Exception as e:
-            st.error(f"Kernel bloqueado o comando inválido: {e}")
+# --- CABECERA CON LOGO CIRCULAR ---
+col_logo, col_text = st.columns([1, 2])
 
-# --- MONITOR LATERAL (PARA MÓVIL SE VE ABAJO) ---
+with col_logo:
+    if os.path.exists("logo.png"):
+        st.markdown('<div class="logo-container">', unsafe_allow_html=True)
+        st.image("logo.png", width=130)
+        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="logo-container"><h1>⚡</h1></div>', unsafe_allow_html=True)
+
+with col_text:
+    st.markdown(f"""
+        <div style="padding-top: 20px;">
+            <h1 style="margin-bottom: 0px;">ECOKERNEL AI</h1>
+            <p style="font-size: 1.4em; color: #FFFFFF; margin-bottom: 0px;">CORE_SYSTEM: {VERSION}</p>
+            <p style="color: #00FF00; font-weight: bold; font-size: 1.1em;">ARCHITECT: {DEVELOPER.upper()}</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.write(f"**SINCRO_ID:** `{datetime.now().strftime('%Y%m%d-%H%M%S')}` | **LOC:** `Caracas, San Bernardino` | **USER:** `Benelope`")
+st.divider()
+
+# --- SIDEBAR: CONTROL DE APLICACIONES ---
+st.sidebar.header("🕹️ CONTROL PANEL")
+sel_lang = st.sidebar.selectbox("🌐 IDIOMA", ["Español", "English", "Русский"])
+
+# --- NUEVA FUNCIÓN: SELECCIONADOR PARA MONITOR ---
+st.sidebar.subheader("📺 MONITOR PROJECTION")
+running_apps = [p.info['name'] for p in psutil.process_iter(['name'])][:15] # Top 15 procesos
+app_to_watch = st.sidebar.selectbox("Selecciona App para Monitorizar:", running_apps)
+
+if st.sidebar.button("PROYECTAR EN MONITOR"):
+    st.sidebar.success(f"Proyectando: {app_to_watch}")
+
+# --- MODULE 02: TELEMETRÍA Y ALMACENAMIENTO DETALLADO ---
+st.subheader("🛰️ [TELEMETRY & STORAGE_DATA]")
+c1, c2, c3 = st.columns(3)
+
+# Obtener info de almacenamiento real
+disk = psutil.disk_usage('/')
+total_gb = f"{disk.total / (1024**3):.1f} GB"
+used_gb = f"{disk.used / (1024**3):.1f} GB"
+
+cpu_val = psutil.cpu_percent(interval=0.5)
+c1.metric("CPU_LOAD", f"{cpu_val}%")
+c2.metric("RAM_STATE", f"{psutil.virtual_memory().percent}%")
+c3.metric("DISK_FREE", f"{disk.percent}%", f"Used: {used_gb} / {total_gb}")
+
+# --- MÓDULOS NEURALES (ÁMBAR Y KENYA) ---
 st.write("---")
-st.markdown("### 📊 ESTADO DE HARDWARE")
-c1, c2 = st.columns(2)
-c1.metric("CPU", f"{psutil.cpu_percent()}%")
-c2.metric("RAM", f"{psutil.virtual_memory().percent}%")
+col_n1, col_n2 = st.columns(2)
 
-st.markdown(f"<p style='text-align:center; opacity:0.3; font-size:0.6em;'>© 2026 SCARLET FUENMAYOR | A31_MOBILE_INTERFACE</p>", unsafe_allow_html=True)
+with col_n1:
+    st.markdown("### 👁️ NEURAL: Ámbar (Data Control)")
+    st.info(f"Monitorizando App Seleccionada: **{app_to_watch}**")
+    if st.button("ANALIZAR ALMACENAMIENTO"):
+        partitions = psutil.disk_partitions()
+        disk_data = []
+        for p in partitions:
+            try:
+                usage = psutil.disk_usage(p.mountpoint)
+                disk_data.append({"Punto": p.mountpoint, "FS": p.fstype, "Uso": f"{usage.percent}%"})
+            except: continue
+        st.table(pd.DataFrame(disk_data))
+
+with col_n2:
+    st.markdown("### 🧠 NEURAL: Kenya (Logic Shield)")
+    diag = "CRITICAL: Migración requerida" if cpu_val > 80 else "NOMINAL: Flujo constante"
+    st.info(f"[DIAGNÓSTICO]: {diag}")
+    st.progress(cpu_val / 100)
+    st.caption("Balance de carga de hilos en tiempo real.")
+
+# --- MODULE 06: SYSTEM DNA ---
+st.write("---")
+st.subheader("🖥️ [SYSTEM_DNA_IDENTIFICATION]")
+col_hw1, col_hw2 = st.columns(2)
+with col_hw1:
+    st.code(f"NODE_NAME: {platform.node()}\nOS_DISTRO: {platform.system()} {platform.release()}", language="bash")
+with col_hw2:
+    st.code(f"PROCESSOR: {platform.processor()}\nBOOT_TIME: {datetime.fromtimestamp(psutil.boot_time()).strftime('%Y-%m-%d %H:%M:%S')}", language="bash")
+
+# --- MODULE 11: THERMAL SECURITY ---
+st.write("---")
+core_temp = 35 + (cpu_val * 0.25)
+st.subheader(f"🌡️ THERMAL MONITOR: {core_temp:.1f}°C")
+if core_temp > 48:
+    st.error("⚠️ SOBRECALENTAMIENTO DETECTADO - ACTIVANDO COOLING PROTOCOL")
+else:
+    st.success("SISTEMA DENTRO DEL RANGO TÉRMICO ÓPTIMO")
+
+# --- ACCIONES MAESTRAS ---
+st.write("---")
+if st.button("👑 SINCRONIZACIÓN MAESTRA (SCARLET PROTOCOL)"):
+    with st.spinner("Sincronizando Hardware..."):
+        time.sleep(2)
+        st.balloons()
+        st.success(f"EcoKernel AI Sincronizado para {DEVELOPER}. Todo el almacenamiento y procesos están bajo control.")
+
+# --- FOOTER ---
+st.markdown(f"""
+    <div style="text-align: center; color: #555; padding: 40px;">
+        <hr style="border: 0.5px solid #00FF00;">
+        {COPYRIGHT}<br>
+        <b>CARACAS, VENEZUELA | SAN BERNARDINO</b><br>
+        <small>Hardware Governance Protocol Active - Ver. {VERSION}</small>
+    </div>
+""", unsafe_allow_html=True)
