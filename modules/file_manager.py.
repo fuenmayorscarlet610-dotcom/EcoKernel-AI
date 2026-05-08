@@ -1,0 +1,41 @@
+# =================================================================
+# ECOKERNEL AI - FILE MANAGEMENT & COMPRESSION MODULE
+# MODULE ID: AMBAR-SHIELD-01
+# =================================================================
+import streamlit as st
+import os
+import zipfile
+from datetime import datetime
+
+def show_file_manager():
+    st.markdown("### 🗄️ AMBAR FILE SHIELD: Visualizador y Compresor")
+    
+    # Ruta por defecto (puedes cambiarla a /sdcard/ si diste permisos en Termux)
+    path = st.text_input("RUTA DE EXPLORACIÓN:", os.getcwd())
+
+    if os.path.exists(path):
+        files = os.listdir(path)
+        
+        # Filtros rápidos para liberar espacio
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(f"Archivos en: `{path}`")
+        with col2:
+            if st.button("📦 COMPRIMIR TODO A .ZIP"):
+                zip_name = f"backup_{datetime.now().strftime('%d%m_%H%M')}.zip"
+                with zipfile.ZipFile(zip_name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    for file in files:
+                        if not file.endswith('.zip'): # Evitar comprimir el zip dentro del zip
+                            zipf.write(os.path.join(path, file), file)
+                st.success(f"Escudo activado: {zip_name} creado con éxito.")
+
+        # Tabla de visualización
+        file_data = []
+        for f in files:
+            f_path = os.path.join(path, f)
+            f_size = os.path.getsize(f_path) / (1024 * 1024) # MB
+            file_data.append({"Nombre": f, "Tamaño (MB)": round(f_size, 2)})
+        
+        st.table(file_data)
+    else:
+        st.error("Error de Acceso: Ruta no encontrada en el Kernel.")
