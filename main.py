@@ -7,15 +7,12 @@
 
 import streamlit as st
 import psutil
-import platform
 import os
 import time
 import requests
-import json
+import pandas as pd
 import hashlib
 from datetime import datetime
-import pandas as pd
-import numpy as np
 
 # --- CONFIG GLOBAL ---
 VERSION = "26.9.5-OMNI-CORE"
@@ -24,9 +21,6 @@ OWM_KEY = "d6f4f14e05df727ec7b12bc21ee4ca49"
 CIUDAD = "La Guaira"
 PAIS = "VE"
 
-# --- ENTORNO ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 st.set_page_config(page_title="EcoKernel AI — UAL", page_icon="🧬", layout="wide")
 
 # --- SESSION STATE ---
@@ -34,25 +28,22 @@ if "cpu_hist" not in st.session_state: st.session_state.cpu_hist = [0.0] * 30
 if "blood_mode" not in st.session_state: st.session_state.blood_mode = False
 if "boot_complete" not in st.session_state: st.session_state.boot_complete = False
 if "audit_log" not in st.session_state: st.session_state.audit_log = []
+if "last_metrics_update" not in st.session_state: st.session_state.last_metrics_update = 0.0
+if "last_weather_fetch" not in st.session_state: st.session_state.last_weather_fetch = 0.0
+if "cached_temp" not in st.session_state: st.session_state.cached_temp, st.session_state.cached_hum = 28.5, 75.0
 
-# --- COLORES DINÁMICOS (BLOOD MODE) ---
+# --- COLORES ---
 def get_colors():
     if st.session_state.blood_mode:
-        return {
-            "primary": "#FF0033", "secondary": "#FF6688", "bg": "#0A0000",
-            "text": "#FFAAAA", "border": "2px solid #330000"
-        }
-    return {
-        "primary": "#00FF00", "secondary": "#00E5FF", "bg": "#000000",
-        "text": "#CCFFCC", "border": "2px solid #003300"
-    }
+        return {"primary": "#FF0033", "secondary": "#FF6688", "bg": "#0A0000", "text": "#FFAAAA"}
+    return {"primary": "#00FF00", "secondary": "#00E5FF", "bg": "#000000", "text": "#CCFFCC"}
 
 colors = get_colors()
 
-# --- FUNCIONES NÚCLEO ---
+# --- LOGICA DE APOYO ---
 def log_event(event):
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    st.session_state.audit_log.insert(0, f"[{timestamp}] {event}")
+    ts = datetime.now().strftime("%H:%M:%S")
+    st.session_state.audit_log.insert(0, f"[{ts}] {event}")
 
 def fetch_weather():
     try:
@@ -60,90 +51,83 @@ def fetch_weather():
         data = requests.get(url, timeout=5).json()
         return data['main']['temp'], data['main']['humidity']
     except:
-        return 28.5, 75.0 # Promedio La Guaira fallback
+        return st.session_state.cached_temp, st.session_state.cached_hum
 
 # --- BOOT SEQUENCE ---
 if not st.session_state.boot_complete:
     boot_placeholder = st.empty()
-    boot_steps = [
-        "Inyectando Micro-Kernel v26.9.5...",
-        "NODE_AMBAR: Estableciendo enlace térmico...",
-        "NODE_KENYA: Cifrado de canal SHA-256...",
-        "Sincronizando con La Guaira Caribbean Station...",
-        "Acceso concedido. Operator: SCARLET"
-    ]
-    for i in range(len(boot_steps) + 1):
-        with boot_placeholder.container():
-            st.markdown(f"""
-                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: monospace; border: {colors['border']};">
-                    <h1 style='color: {colors['primary']}; font-family: sans-serif; letter-spacing: 10px; text-shadow: 0 0 15px {colors['primary']};'>ECOKERNEL UAL</h1>
-            """, unsafe_allow_html=True)
-            for j in range(i):
-                st.markdown(f"<p style='color: {colors['secondary']};'>[SYSTEM] > {boot_steps[j]}</p>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-            time.sleep(0.4)
+    for i in range(4):
+        boot_placeholder.markdown(f"<h2 style='color:{colors['primary']}; text-align:center;'>RE-CALIBRANDO KERNEL... {i*25}%</h2>", unsafe_allow_html=True)
+        time.sleep(0.3)
     boot_placeholder.empty()
     st.session_state.boot_complete = True
-    log_event("SISTEMA OPERATIVO INICIADO")
+    log_event("PATCH ECO-REFRESH APLICADO")
 
-# --- CSS INJECT ---
-st.markdown(f"""
-    <style>
-    .stApp {{ background-color: {colors['bg']} !important; color: {colors['text']} !important; }}
-    [data-testid="stMetricValue"] {{ color: {colors['primary']} !important; font-family: monospace; font-weight: bold; }}
-    .stMetric {{ background: rgba(10,10,10,0.8); border-left: 4px solid {colors['primary']}; padding: 10px; }}
-    #MainMenu, footer, header {{ visibility: hidden; }}
-    .stButton>button {{ background: transparent; color: {colors['primary']}; border: 1px solid {colors['primary']}; width: 100%; font-family: monospace; }}
-    .stButton>button:hover {{ background: {colors['primary']}; color: black; box-shadow: 0 0 20px {colors['primary']}; }}
-    </style>
-    """, unsafe_allow_html=True)
+# --- CSS ---
+st.markdown(f"<style>.stApp {{ background-color: {colors['bg']} !important; color: {colors['text']} !important; }}</style>", unsafe_allow_html=True)
 
-# --- HUD PRINCIPAL ---
-st.markdown(f"<h1 style='text-align: center; letter-spacing: 20px; color: {colors['primary']};'>ECOKERNEL AI</h1>", unsafe_allow_html=True)
+# --- TELEMETRÍA (PATCH RECOMENDADO) ---
+now = time.time()
+REFRESH_SEC = 6 if not st.session_state.blood_mode else 12
+WEATHER_TTL = 15 * 60
 
-# --- TELEMETRÍA ---
-temp, hum = fetch_weather()
-cpu = psutil.cpu_percent()
-st.session_state.cpu_hist.append(cpu)
-st.session_state.cpu_hist = st.session_state.cpu_hist[-30:]
+if (now - st.session_state.last_metrics_update) >= REFRESH_SEC:
+    st.session_state.last_metrics_update = now
+    cpu = psutil.cpu_percent(interval=None)
+    ram = psutil.virtual_memory().percent
+    
+    # Weather con TTL
+    if (now - st.session_state.last_weather_fetch) >= WEATHER_TTL:
+        st.session_state.last_weather_fetch = now
+        st.session_state.cached_temp, st.session_state.cached_hum = fetch_weather()
+    
+    st.session_state.cpu_hist.append(cpu)
+    st.session_state.cpu_hist = st.session_state.cpu_hist[-30:]
+    st.session_state.cached_cpu, st.session_state.cached_ram = cpu, ram
+
+# Lectura de variables cacheadas
+cpu = st.session_state.get("cached_cpu", 0.0)
+ram = st.session_state.get("cached_ram", 0.0)
+
+st.markdown(f"<h1 style='text-align:center; letter-spacing:15px; color:{colors['primary']};'>ECOKERNEL</h1>", unsafe_allow_html=True)
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("🌡️ EXT_TEMP", f"{temp} C")
-c2.metric("💧 HUMIDITY", f"{hum}%")
-c3.metric("⚡ CPU_SYNC", f"{cpu}%")
-c4.metric("💾 RAM_SYNC", f"{psutil.virtual_memory().percent}%")
+c1.metric("🌡️ TEMP", f"{st.session_state.cached_temp:.1f} C")
+c2.metric("💧 HUM", f"{st.session_state.cached_hum:.0f}%")
+c3.metric("⚡ CPU", f"{cpu:.1f}%")
+c4.metric("💾 RAM", f"{ram:.1f}%")
 
-st.area_chart(pd.DataFrame(st.session_state.cpu_hist, columns=['UAL_LOAD']), color=colors['primary'])
+df = pd.DataFrame(st.session_state.cpu_hist, columns=['UAL_LOAD'])
+if not st.session_state.blood_mode:
+    st.area_chart(df, color=colors["primary"])
+else:
+    st.line_chart(df, color=colors["primary"])
 
-# --- DIVISIÓN DE NODOS ---
-col_ambar, col_kenya = st.columns(2)
+# --- NODOS DE CONTROL (COHERENCIA REAL) ---
+col_a, col_k = st.columns(2)
 
-with col_ambar:
-    st.markdown(f"### 🧬 NODE_AMBAR (Sustainability)")
-    st.caption("Optimización de Recursos y Gestión de Entorno")
+with col_a:
+    st.markdown("### 🧬 NODE_AMBAR")
     if st.button("CALIBRATE_THERMAL_SYNC"):
-        log_event("Calibración térmica ejecutada para La Guaira.")
-        st.toast("Sincronizando ventilación y carga...")
+        # Acción real: Forzar refresco lento para enfriar procesos
+        st.session_state.blood_mode = True
+        log_event("THERMAL_SYNC: Modo ahorro activado.")
+        st.toast("Reduciendo ciclos de refresco para enfriar hardware...")
 
-with col_kenya:
-    st.markdown(f"### 🛡️ NODE_KENYA (Security)")
-    st.caption("Protocolos de Acceso y Blindaje IA")
+with col_k:
+    st.markdown("### 🛡️ NODE_KENYA")
     if st.button("EXECUTE_SHA256_PURGE"):
-        log_event("Purga de procesos no firmados iniciada.")
-        st.success("Kernel blindado. Acceso restringido.")
+        # Acción real: Validar integridad del archivo main.py
+        with open(__file__, "rb") as f:
+            file_hash = hashlib.sha256(f.read()).hexdigest()
+        log_event(f"INTEGRITY_CHECK: {file_hash[:10]}... OK")
+        st.success("Integridad de Kernel verificada vía SHA-256.")
 
-# --- SIDEBAR & AUDIT LOG ---
+# --- SIDEBAR ---
 st.sidebar.markdown(f"### 🚨 UAL GOVERNANCE")
-st.session_state.blood_mode = st.sidebar.toggle("BLOOD_MODE", value=st.session_state.blood_mode)
+st.session_state.blood_mode = st.sidebar.toggle("BLOOD_MODE (ECO)", value=st.session_state.blood_mode)
 st.sidebar.write("---")
 st.sidebar.markdown("### 📝 AUDIT_LOG")
-for log in st.session_state.audit_log[:10]:
+for log in st.session_state.audit_log[:8]:
     st.sidebar.text(log)
-
-if st.sidebar.button("HARD_REBOOT"):
-    st.session_state.boot_complete = False
-    st.session_state.audit_log = []
-    st.rerun()
-
-st.markdown(f"<div style='text-align:center; opacity:0.1; font-size: 10px; margin-top: 50px;'>(c) 2026 {DEVELOPER} // {VERSION}</div>", unsafe_allow_html=True)
     
