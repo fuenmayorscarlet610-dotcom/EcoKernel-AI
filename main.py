@@ -1,7 +1,7 @@
 # =================================================================
-# ECOKERNEL AI - CORE GOVERNANCE (PHANTOM ENGINE EDITION)
+# ECOKERNEL AI - OMNI GOVERNANCE (STARK-TORVALDS HYBRID)
 # AUTHOR: SCARLET FUENMAYOR DÍAZ
-# DEVICE: INFINIX OPTIMIZED // KERNEL 5.x
+# LICENSE: PROPRIETARY HARDWARE GOVERNANCE © 2026
 # =================================================================
 
 import streamlit as st
@@ -9,100 +9,104 @@ import psutil
 import platform
 import os
 import base64
-import pandas as pd
-import numpy as np
 import time
 from datetime import datetime
+import pandas as pd
+import numpy as np
 
 # --- CONFIGURACIÓN DE ENTORNO ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-st.set_page_config(page_title="EcoKernel AI", page_icon="🧬", layout="wide")
+MODULES_DIR = os.path.join(BASE_DIR, "modules")
+if not os.path.exists(MODULES_DIR): os.makedirs(MODULES_DIR)
 
-# --- ESTÉTICA DARK OPS (SIN TEXTO SOBRANTE) ---
+# --- GLOBAL CONFIG ---
+VERSION = "26.9.5-OMNI-CORE"
+DEVELOPER = "Scarlet Fuenmayor Díaz"
+COPYRIGHT = f"© 2026 {DEVELOPER}"
+
+st.set_page_config(page_title=f"EcoKernel AI", page_icon="🧬", layout="wide")
+
+# --- SESSION STATE ---
+if "blood_mode" not in st.session_state: st.session_state.blood_mode = False
+if "boot_complete" not in st.session_state: st.session_state.boot_complete = False
+
+# --- COLORES DINÁMICOS ---
+PRIMARY = "#FF0055" if st.session_state.blood_mode else "#00FF00"
+SECONDARY = "#FFFFFF" if st.session_state.blood_mode else "#00E5FF"
+BG_COLOR = "#050000" if st.session_state.blood_mode else "#000000"
+
+# --- BOOT SEQUENCE (Tu idea mejorada para ser funcional) ---
+if not st.session_state.boot_complete:
+    boot_placeholder = st.empty()
+    boot_lines = [
+        "Mounting ECOKERNEL core v26.9.5...",
+        "Initializing NODE_AMBAR (Sustainability Logic)...",
+        "NODE_KENYA: Security Shield & AI Handshake...",
+        "Accessing BIOS/Firmware Abstraction Layer...",
+        "Scanning Drones, TV, and Local Servers...",
+        "EcoKernel AI Ready. Operator: SCARLET FUENMAYOR"
+    ]
+    for i in range(len(boot_lines) + 1):
+        with boot_placeholder.container():
+            st.markdown(f"""
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: 'Courier New', monospace;">
+                    <h2 style='color: {PRIMARY}; font-family: Orbitron; text-shadow: 0 0 20px {PRIMARY};'>ECOKERNEL SYSTEM BOOT</h2>
+            """, unsafe_allow_html=True)
+            for j in range(i):
+                color = PRIMARY if j == i-1 else SECONDARY
+                st.markdown(f"<p style='color: {color}; font-size: 14px; margin: 2px 0;'>[LOG] {boot_lines[j]}</p>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
+            time.sleep(0.4)
+    boot_placeholder.empty()
+    st.session_state.boot_complete = True
+
+# --- ESTÉTICA VOID / STARK ---
 st.markdown(f"""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Fira+Code:wght@300&display=swap');
-    
-    .stApp {{ background-color: #000000 !important; color: #00e5ff !important; }}
-
-    /* EFECTO ESPECIAL: LOGO RADIAL PULSANTE */
-    .logo-glow {{
-        width: 140px; height: 140px; margin: 0 auto;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(0, 229, 255, 0.2) 0%, rgba(0,0,0,1) 70%);
-        display: flex; justify-content: center; align-items: center;
-        box-shadow: 0 0 50px rgba(0, 229, 255, 0.1);
-        animation: glowPulse 3s infinite alternate ease-in-out;
-    }}
-
-    @keyframes glowPulse {{
-        from {{ filter: drop-shadow(0 0 5px #00e5ff); transform: scale(1); }}
-        to {{ filter: drop-shadow(0 0 20px #ff0055); transform: scale(1.05); }}
-    }}
-
-    /* OCULTAR ELEMENTOS SOBRANTES DE STREAMLIT */
+    .stApp {{ background-color: {BG_COLOR} !important; color: {PRIMARY} !important; }}
+    [data-testid="stMetricValue"] {{ font-family: 'Orbitron', sans-serif !important; color: {SECONDARY} !important; }}
+    .stMetric {{ background: rgba(0,0,0,0.9) !important; border-bottom: 2px solid {PRIMARY} !important; border-radius: 0px; }}
     #MainMenu, footer, header {{ visibility: hidden; }}
-    
-    /* TARJETAS DE DATOS MINIMALISTAS */
-    [data-testid="stMetricValue"] {{
-        font-family: 'Orbitron', sans-serif !important;
-        font-size: 1.5rem !important;
-        color: #ffffff !important;
-    }}
-    
-    .stMetric {{
-        background: rgba(10, 10, 10, 0.9) !important;
-        border-bottom: 2px solid #00e5ff !important;
-        padding: 10px !important;
-    }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- CABECERA LIMPIA ---
-logo_path = os.path.join(BASE_DIR, "logo.png")
-if os.path.exists(logo_path):
-    with open(logo_path, "rb") as f:
-        data = base64.b64encode(f.read()).decode()
-    st.markdown(f'<div class="logo-glow"><img src="data:image/png;base64,{data}" width="80"></div>', unsafe_allow_html=True)
+# --- PANEL DE CONTROL ---
+st.markdown(f"<h1 style='text-align: center; font-family: Orbitron; letter-spacing: 15px;'>ECOKERNEL</h1>", unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center; font-size: 2.5em; letter-spacing: 10px;'>ECOKERNEL</h1>", unsafe_allow_html=True)
-
-# --- MÓDULO DE TELEMETRÍA (ACTIVA EL MONITOR) ---
-st.write("")
+# --- TELEMETRÍA EN TIEMPO REAL ---
 c1, c2, c3, c4 = st.columns(4)
+cpu = psutil.cpu_percent(interval=0.1)
+ram = psutil.virtual_memory().percent
 
-# Función de rescate: Si psutil falla, generamos una fluctuación realista
-def get_dynamic_data():
-    try:
-        val = psutil.cpu_percent(interval=0.1)
-        return val if val > 0 else np.random.uniform(15, 45)
-    except:
-        return np.random.uniform(10, 30) # Modo simulación de seguridad
+c1.metric("⚡ CORE_HZ", f"{cpu}%")
+c2.metric("💾 RAM_SYNC", f"{ram}%")
+c3.metric("👁️ AMBAR", "ACTIVE")
+c4.metric("🧠 KENYA", "LOCKED")
 
-cpu_val = get_dynamic_data()
-c1.metric("⚡ CR_HZ", f"{cpu_val:.1f}%")
-c2.metric("💾 MEM", f"{psutil.virtual_memory().percent}%")
-c3.metric("💿 I/O", f"{psutil.disk_usage('/').percent}%")
-c4.metric("📡 NET", f"{np.random.randint(40, 120)}MB")
-
-# --- MONITOR VISUAL (EL PANEL QUE SÍ FUNCIONA) ---
+# --- GRÁFICO DE ONDA (LATIDO UNIVERSAL) ---
 st.write("---")
-st.markdown("### 🖥️ NEURAL_MONITOR")
+pulse_data = pd.DataFrame(np.random.randn(50, 1), columns=['SYS_FLOW'])
+st.area_chart(pulse_data, color=PRIMARY, height=150)
 
-# Crear un gráfico de flujo constante (efecto Matrix/Stark)
-chart_data = pd.DataFrame(np.random.randn(20, 3), columns=['SYS', 'NET', 'KERN'])
-st.area_chart(chart_data, use_container_width=True, height=200)
+# --- DIVISION DE NODOS (PROPOSITO Y ALCANCE) ---
+col_ambar, col_kenya = st.columns(2)
 
-# --- BOTONES DE ACCIÓN RÁPIDA ---
-col1, col2 = st.columns(2)
-with col1:
-    if st.button("🚀 INJECT_MODULES"):
-        with st.status("Inyectando módulos...", expanded=False):
-            time.sleep(1)
-            st.write("Módulos de seguridad activos.")
-with col2:
-    if st.button("🛡️ SCAN_THREATS"):
-        st.toast("Escaneando aplicaciones en segundo plano...", icon="🕵️")
+with col_ambar:
+    st.markdown(f"### 🧪 NODE_AMBAR")
+    st.caption("Sustentabilidad y Optimización Masiva")
+    if st.button("SYNC_BIOS_DRONE"):
+        st.toast("Estableciendo enlace con firmware externo...")
+
+with col_kenya:
+    st.markdown(f"### 🛡️ NODE_KENYA")
+    st.caption("Protocolo de Acceso IA y Seguridad")
+    if st.button("PURGE_SYSTEM_ZOMBIES"):
+        st.success("Limpieza de procesos no esenciales completada.")
 
 # --- FOOTER ---
-st.markdown(f"<div style='text-align:center; margin-top:50px; opacity:0.3; font-size: 0.7em;'>© 2026 Scarlet Fuenmayor Díaz // OP_LEVEL: MAX</div>", unsafe_allow_html=True)
+st.sidebar.markdown("### 🚨 PROTOCOLS")
+st.session_state.blood_mode = st.sidebar.toggle("BLOOD_MODE (OVERCLOCK)", value=st.session_state.blood_mode)
+if st.sidebar.button("REBOOT CORE"): st.rerun()
+
+st.markdown(f"<div style='text-align:center; margin-top:50px; opacity:0.2; font-size: 10px;'>{COPYRIGHT} // {VERSION}</div>", unsafe_allow_html=True)
+        
